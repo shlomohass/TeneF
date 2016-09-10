@@ -226,4 +226,61 @@ class User extends Basic {
         }
         return true;
     }
+    /** Checks if the logged user is in god mode group
+     *
+     * @return boolean
+     *
+     */
+    public function is_god() {
+        $user = self::$conn->get("users", $this->user_info);
+        if (intval($user['user_is_type']) === 1) {
+            return true;
+        }
+        return false;
+    }
+    /** Returns the priv list of the loged user
+     *  If empty array no privs.
+     *
+     * @return Array()
+     *
+     */
+    public function list_privs() {
+        $user_priv = self::$conn->select(
+            "user_priv", 
+            '* ',
+            array(array('priv_user','=', $this->user_info))
+        );
+        if (is_array($user_priv) && !empty($user_priv)) {
+            return $user_priv;
+        }
+        return array();
+    }
+    /** Checks If a User has priv on a unit and which
+     *  
+     *
+     * @return Array( has => boolean, units => boolean, am => boolean)
+     *
+     */
+    public function check_privs_on_unit($unitId) {
+        $user_priv = self::$conn->select(
+            "user_priv", 
+            '* ',
+            array(
+                array('priv_user','=', $this->user_info),
+                array('priv_on_unit','=', $unitId)     
+            )
+        );
+        if (is_array($user_priv) && !empty($user_priv)) {
+            return array(
+                "has"   => true,
+                "units" => ($user_priv[0]['user_can_edit_units'])?true:false,
+                "am"    => ($user_priv[0]['user_can_edit_amlah'])?true:false,
+            );
+        }
+        return array(
+                "has"   => false,
+                "units" => false,
+                "am"    => false,
+            );
+    }
 }

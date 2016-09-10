@@ -17,38 +17,42 @@ if ( $inputs['type'] !== '' ) {
     
     switch (strtolower($inputs['type'])) {
         
-        /**** Upload a file to storage with validation: ****/
-        case "uploadfile":  
-            
-            if (empty($_FILES)) { $Api->error("no-file"); }
+        /**** Show A unit List of Amlah: ****/
+        case "listamlahofunit":  
             
             //Synth needed:
-            $get = array(
-                "tempFile" => (isset($_FILES['file']) && isset($_FILES['file']['tmp_name'])) ? $_FILES['file']['tmp_name'] : false,
-                "targetFile" => (isset($_FILES['file']) && isset($_FILES['file']['name'])) ? $_FILES['file']['name'] : false
-            );
+            $get = $Api->Func->synth($_REQUEST, array('unit'),false);
             
             //Validation:
             if (
-                    empty($get['tempFile'])
-                ||  empty($get['targetFile'])
+                    empty($get['unit'])
+                ||  !is_numeric($get['unit'])
             ) {
                 $Api->error("not-legal");
             }
             
             //Logic:
             $Op = new Operation();
-            $res = $Op->upload_file($get['tempFile'], $get['targetFile'], $conf['storage_folder']);
             
+            //Test Priv on unit:
+            $userGod = $User->is_god();
+            $userPrivsOnUnit = $User->check_privs_on_unit($get['unit']);
+            $unitList = false;
+            if ($userGod || $userPrivsOnUnit['has']) {
+                $unitList = $Op->get_unit_am_list($get['unit'], $Api::$conn);
+            } else {
+                $Api->error("no-priv");
+            }
             //Output:
-            if ($res === true) {
+            if (is_array($unitList)) {
                $results = array(
-                    "fileId" => 2,
-                    "filename" => $Op->sys_filename_cache,
+                   "amlist" => $unitList,
+                   "ofunit" => $get['unit'],
+                   "editPriv" => ($userGod || ($userPrivsOnUnit['has'] && $userPrivsOnUnit['am']))?true:false
                 );
                 $success = "with-results";
             } else {
-                $Api->error("copy-file");
+                $Api->error("results-false");
             }
         break;
         
@@ -71,8 +75,48 @@ if ( $inputs['type'] !== '' ) {
                     array( "column" => 0, "dir" => "asc")
                 );
             }
+            
+            //User privs:
+            $userGod = $User->is_god();
+            $userListPriv = $User->list_privs();
+            
+            //The Data set
+            $where = false;
+            if( !empty($get['search']['value']) ) {
+               $where = array();
+               foreach($columns as $col) {
+                   $where[] = "`".$col."` LIKE '".$Api::$conn->filter($get['search']['value'])."%' ";
+               }
+               $where = implode("OR ", $where);
+            }
+            $data = $Api::$conn->get_joined(
+                array(
+                   array('LEFT', 'unit_list.unit_location','location.loc_id')
+                ), 
+                " `unit_id`,`unit_name`,`unit_type`,`unit_of`,`loc_name`,`unit_info` ",
+                $where,
+                false,
+                array(
+                    $get['order'][0]['dir'],
+                    array($columns[$get['order'][0]['column']])
+                ),
+                array(
+                    $get['start'],
+                    $get['length']
+                )
+            );
+            
+            //Filter by priv
+            if (!$userGod && is_array($data)) {
+                foreach ($data as $key => $unit) {
+                    if ($unit['unit_id'])
+                } 
+            }
+            
+            //The count:
             $totalData = $Api::$conn->num_rows("SELECT * FROM `unit_list`");
             $totalFiltered = $totalData;
+            
             $where = false;
             if( !empty($get['search']['value']) ) {
                $where = array();

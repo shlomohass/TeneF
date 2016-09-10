@@ -147,9 +147,10 @@ body {
     color: #7b3c94;
 }
 /*************************************************************
- * Admin left main content :
+ * Modal Edit Sadac :
  *************************************************************/
 .modalTeneF {
+    display: none;
     position: absolute;
     background-color: rgba(4, 4, 4, 0.62);
     height: 100%;
@@ -184,6 +185,7 @@ body {
     height: 50vh;
     background-color: white;
     padding: 20px;
+    padding-top: 0px;
 }
 .modalTeneF .modalTeneF_wrap .modalTeneF_foot {
     padding: 10px;
@@ -203,6 +205,28 @@ body {
 .modalTeneF .modalTeneF_wrap .modalTeneF_body h4 .glyphicon {
     font-size: 14px;
     margin-left: 5px;
+}
+.modalTeneF .modalTeneF_wrap .amlist_quick_view {
+    width:100%;
+}
+.modalTeneF .modalTeneF_wrap .amlist_quick_view tr:nth-child(even) {
+    background-color: #efefef;
+    border-right: 1px solid #efefef;
+    border-left: 1px solid #efefef;
+}
+.modalTeneF .modalTeneF_wrap .amlist_quick_view tr th {
+      padding: 4px 8px;
+      border: 1px solid grey;
+      background-color: #f1e3ff;
+      text-align: right;
+}
+.modalTeneF .modalTeneF_wrap .amlist_quick_view tr td {
+    padding: 4px 8px;
+}
+.modalTeneF .modalTeneF_wrap .amlist_quick_view tr td .glyphicon {
+    float:left;
+    margin-right: 12px;
+    cursor:pointer;
 }
 /*************************************************************
  * Spacers :

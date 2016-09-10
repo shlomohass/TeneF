@@ -21,8 +21,7 @@ class Api extends Basic {
         "results-false" => "106",
         "not-loged"     => "107",
         "not-legal"     => "108",
-        "no-file"       => "109",
-        "copy-file"     => "110",
+        "no-priv"       => "109"
     );
     private $suc_codes = array(
         "general"       => "201",

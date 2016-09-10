@@ -8,49 +8,18 @@
 
 class Operation {
     
-    public $sys_filename_cache = ""; 
-    
     public function __construct() {
         Trace::add_trace('construct class',__METHOD__);  
     }
     
-    
-    public function get_allowed_ext() {
-        
+    public function get_unit_am_list($unitId, $conn) {
+        $results = $conn->get_joined(
+            array(array("LEFT","amlah_list.am_list_of_type","amlah_type.am_type_id")), 
+            "`amlah_list`.`am_list_id`, `amlah_list`.`am_list_number`, `amlah_list`.`am_list_yeud`, `amlah_type`.`am_type_name`",
+            "`amlah_list`.`am_list_of_unit` = ".$conn->filter($unitId),
+            false,
+            array(array("amlah_type.am_type_name"),"DESC")
+        );
+        return (!empty($results))?$results:array();
     }
-    
-    public function set_allowed_ext() {
-        
-    }
-    
-    /* 
-     * Uploads A file To Storage Folder
-     * Will generate and cache new file name.
-     *
-     * @param string $tempFile
-     * @param string $targetFile
-     * @param string $storeFolder
-     * @return boolean
-     *
-     */
-    public function upload_file($tempFile, $targetFile, $storeFolder) {
-        $targetPath = $storeFolder.DS; 
-        if (!move_uploaded_file($tempFile, $targetPath.$targetFile)) {
-            return false;
-        }
-        $this->sys_filename_cache = $targetFile;
-        return true;
-    }
-    
-    public function register_file_db() {
-        
-    }
-    
-    public function validate_file($targetFile, $fileSize) {
-        
-    }
-    
-    /*
-     *
-     */
 }
