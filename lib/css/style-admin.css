@@ -26,11 +26,17 @@
 * {
 	box-sizing: border-box;
 }
+html {
+    height: 100%;
+}
 body {
 	font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
     font-size: 14px;
     color: #333;
     background-color: rgb(250, 250, 250);
+    direction:rtl;
+    height: 100%;
+    overflow-y: hidden;
 }
 
 /*************************************************************
@@ -40,10 +46,10 @@ body {
     width:240px;
     position:fixed;
     height:100%;
-    left:0;
+    right:0;
 }
 .col-offset-240{
-    padding-left:255px;
+    padding-right:255px;
 }
 
 /*************************************************************
@@ -54,54 +60,84 @@ body {
     color:aliceblue;
     line-height: 40px;
 }
+.admin-top-bar > div {
+    display: inline-block;
+    font-weight: bold;
+    font-size: 16px;
+    padding: 0 15px;
+    color: #db96f7;
+}
+.admin-top-bar > ul {
+    
+}
+.admin-top-bar > ul > li > a,
+.admin-top-bar > ul > li > a:link,
+.admin-top-bar > ul > li > a:visited,
+.admin-top-bar > ul > li > a:focus
+{
+    padding:0px 15px;
+    outline: none;
+    color:aliceblue;
+    line-height: 40px;
+    display: inline-block;
+    text-decoration: none;
+}
+.admin-top-bar > ul > li > a:hover
+{
+    background-color:#454548;
+    text-decoration: none;
+}
 /*************************************************************
- * Admin left bar nav :
+ * Admin right bar nav :
  *************************************************************/
-.admin-left-bar {
+.admin-right-bar {
     background:#323338;
     color:aliceblue;
-    z-index: 2;
+    z-index: 25;
 }
-.admin-left-bar ul.nav-but {
+.admin-right-bar ul.nav-but {
     list-style: none;
     padding: 0;
     margin:0;
     margin-top: 15px;
 }
-.admin-left-bar ul.nav-but > li {
+.admin-right-bar ul.nav-but > li {
     border-bottom: 1px solid #545454;
     cursor:pointer;
-    border-left: 4px solid transparent;  
+    border-right: 4px solid transparent;  
 }
-.admin-left-bar ul.nav-but > li a,
-.admin-left-bar ul.nav-but > li a:hover,
-.admin-left-bar ul.nav-but > li a:visited,
-.admin-left-bar ul.nav-but > li a:focus {
+.admin-right-bar ul.nav-but > li a,
+.admin-right-bar ul.nav-but > li a:hover,
+.admin-right-bar ul.nav-but > li a:visited,
+.admin-right-bar ul.nav-but > li a:focus {
     color:aliceblue;
     text-decoration: none;
     padding: 10px 15px;
     display: inline-block;
     width: 100%;
 }
-.admin-left-bar ul.nav-but > li:hover {
+.admin-right-bar ul.nav-but > li:hover {
     background-color: #454548;
-    border-left: 4px solid #784c8a;
+    border-right: 4px solid #784c8a;
 }
-.admin-left-bar ul.nav-but > li.nav-active:hover {
+.admin-right-bar ul.nav-but > li.nav-active:hover {
     background-color: transparent;
 }
-.admin-left-bar ul.nav-but > li.nav-active {
-    border-left: 4px solid #ce57ff;  
+.admin-right-bar ul.nav-but > li.nav-active {
+    border-right: 4px solid #ce57ff;  
 }
-.admin-left-bar ul.nav-but > li .glyphicon {
-    margin-right: 5px;  
+.admin-right-bar ul.nav-but > li .glyphicon {
+    margin-left: 5px;  
 }
 /*************************************************************
- * Admin right main content :
+ * Admin left main content :
  *************************************************************/
 .admin-main-bar {
     padding: 15px;
-    padding-left: 255px;
+    padding-right: 255px;
+    min-height: 100vh;
+    max-height: 100vh;
+    overflow-y: scroll;
 }
 .admin-main-bar > h2 {
     font-size: 24px;
@@ -109,6 +145,64 @@ body {
     margin-bottom: 25px;
     padding-bottom: 5px;
     color: #7b3c94;
+}
+/*************************************************************
+ * Admin left main content :
+ *************************************************************/
+.modalTeneF {
+    position: absolute;
+    background-color: rgba(4, 4, 4, 0.62);
+    height: 100%;
+    top: 0;
+    right: 238px;
+    left:0;
+    z-index: 20;
+}
+.modalTeneF .modalTeneF_wrap {
+    margin: 35px;
+    border-radius: 5px;
+    -webkit-box-shadow: 1px 1px 11px 1px #404040;
+    -moz-box-shadow: 1px 1px 11px 1px #404040;
+    box-shadow: 1px 1px 11px 1px #404040;
+}
+.modalTeneF .modalTeneF_wrap .modalTeneF_head {
+    background-color: #f6eff9;
+    padding: 20px;
+    border-radius: 5px 5px 0px 0px;
+    font-size: 18px;
+    font-weight: bold;
+    border-bottom: 1px solid #e6ddea;
+}
+.modalTeneF .modalTeneF_wrap .modalTeneF_head .highlighted_name {
+    color: #a960c7;
+}
+.modalTeneF .modalTeneF_wrap .modalTeneF_bodyFixed {
+    background-color: white;
+    padding: 20px;
+}
+.modalTeneF .modalTeneF_wrap .modalTeneF_body {
+    height: 50vh;
+    background-color: white;
+    padding: 20px;
+}
+.modalTeneF .modalTeneF_wrap .modalTeneF_foot {
+    padding: 10px;
+    background-color: white;
+    border-radius: 0px 0px 5px 5px;
+    border-top: 1px solid #e4e4e4;
+    text-align: left;
+}
+.modalTeneF .modalTeneF_wrap .modalTeneF_bodyFixed h4,
+.modalTeneF .modalTeneF_wrap .modalTeneF_body h4 {
+    border-bottom: 1px solid #cecece;
+    padding-bottom: 5px;
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+.modalTeneF .modalTeneF_wrap .modalTeneF_bodyFixed h4 .glyphicon,
+.modalTeneF .modalTeneF_wrap .modalTeneF_body h4 .glyphicon {
+    font-size: 14px;
+    margin-left: 5px;
 }
 /*************************************************************
  * Spacers :

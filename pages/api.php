@@ -52,17 +52,18 @@ if ( $inputs['type'] !== '' ) {
             }
         break;
         
-        case "tableuser":
+        case "listmanageunits":
             $get = $Api->Func->synth($_REQUEST, array('draw','columns','order','start','length','search'),false);
             $get["order"] = (isset($_REQUEST["order"]) && is_array($_REQUEST["order"]))?$_REQUEST["order"]:"";
             $get["search"] = (isset($_REQUEST["search"]) && is_array($_REQUEST["search"]))?$_REQUEST["search"]:"";
             $columns = array( 
                 // datatable column index  => database column name
-                0 => 'username', 
-                1 => 'seen',
-                2 => 'created',
-                3 => 'last_seen',
-                4 => 'email'
+                0 => 'unit_id',
+                1 => 'unit_name', 
+                2 => 'unit_type',
+                3 => 'unit_of',
+                4 => 'unit_location',
+                5 => 'unit_info'
             );
             
             if (empty($get['order'])) {
@@ -70,7 +71,7 @@ if ( $inputs['type'] !== '' ) {
                     array( "column" => 0, "dir" => "asc")
                 );
             }
-            $totalData = $Api::$conn->num_rows("SELECT * FROM `users`");
+            $totalData = $Api::$conn->num_rows("SELECT * FROM `unit_list`");
             $totalFiltered = $totalData;
             $where = false;
             if( !empty($get['search']['value']) ) {
@@ -80,9 +81,11 @@ if ( $inputs['type'] !== '' ) {
                }
                $where = implode("OR ", $where);
             }
-            $data = $Api::$conn->select(
-                    'users', 
-                    " `username`,`seen`,`created`,`last_seen`,`email` ",
+            $data = $Api::$conn->get_joined(
+                    array(
+                       array('LEFT', 'unit_list.unit_location','location.loc_id')
+                    ), 
+                    " `unit_id`,`unit_name`,`unit_type`,`unit_of`,`loc_name`,`unit_info` ",
                     $where,
                     false,
                     array(
@@ -96,13 +99,20 @@ if ( $inputs['type'] !== '' ) {
                 );
             $final_data = array();
             if (is_array($data)) {
-                foreach ($data as $key => $duser) {
+                
+                $all_units = $Api::$conn->get("unit_list");
+                
+                foreach ($data as $key => $dunit) {
+                    
+                    $of_unit = $Api->Func->search_by_value_pair($all_units, "unit_id", $dunit['unit_of'], "unit_name");
                     $final_data[] = array(
-                        $duser['username'],
-                        $duser['seen'],
-                        $duser['created'],
-                        $duser['last_seen'],
-                        $duser['email']
+                        $dunit['unit_id'],
+                        $dunit['unit_name'],
+                        $dunit['unit_type'],
+                        !empty($of_unit)?$of_unit:NULL,
+                        $dunit['loc_name'],
+                        $dunit['unit_info'],
+                        NULL
                     );
                 }
             } else {

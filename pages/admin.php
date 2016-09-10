@@ -13,8 +13,8 @@ Trace::add_step(__FILE__,"Define css libs for head section");
 $Page->include_css(array(
     GPATH_LIB_STYLE."font-awesome.min.css",
     GPATH_LIB_STYLE."bootstrap.min.css",
-    GPATH_LIB_STYLE."dropzone.css",
-    GPATH_LIB_STYLE."datatables/dataTables.bootstrap.min.css"
+    GPATH_LIB_STYLE."datatables/dataTables.bootstrap.css",
+    GPATH_LIB_STYLE."selectjquery/select2.css"
 ));
     
 
@@ -23,8 +23,9 @@ Trace::add_step(__FILE__,"Define js libs for head section");
 $Page->include_js(array(
     GPATH_LIB_JS."jquery-1.12.3.min.js",
     GPATH_LIB_JS."bootstrap.min.js",
-    GPATH_LIB_JS."datatables/jquery.dataTables.min.js",
-    GPATH_LIB_JS."datatables/dataTables.bootstrap.min.js",
+    GPATH_LIB_JS."datatables/jquery.dataTables.js",
+    GPATH_LIB_JS."datatables/dataTables.bootstrap.js",
+    GPATH_LIB_JS."selectjquery/select2.full.min.js"
 ));
 
 /****************************** Include JS Lang hooks ***********************************/
@@ -35,15 +36,22 @@ $Page->set_js_lang(Lang::lang_hook_js("script-frontend"));
 
 /****************************** Set Page Meta ***********************************/
 Trace::add_step(__FILE__,"Set admin page data");
-$Page->title = Lang::P("gen_title_prefix",false).Lang::P("home_title",false);
-$Page->description = Lang::P("home_desc",false);
-$Page->keywords = Lang::P("home_keys",false);
+$Page->title = Lang::P("gen_title_prefix",false).Lang::P("admin_title",false);
+$Page->description = Lang::P("admin_desc",false);
+$Page->keywords = Lang::P("admin_keys",false);
 
 
 
 /****************************** Set Page Variables ***********************************/
 $_view = $Page->Func->synth($_GET, array("t"))["t"];
-$Page->variable("load-view", (!empty($_view) && ($_view === "dash" || $_view === "users" || $_view === "share" || $_view === "stats" || $_view === "maintain" || $_view === "frontend" || $_view === "adver")) ? $_view : "dash" );
+$Page->variable("load-view", (!empty($_view) 
+                                && (
+                                    $_view === "dash" || 
+                                    $_view === "makereport" || 
+                                    $_view === "showreport" || 
+                                    $_view === "stats" || 
+                                    $_view === "inventory")
+                             ) ? $_view : "dash" );
 
 
 /****************************** Load  Page Data ***********************************/
@@ -54,7 +62,6 @@ $Page->variable("load-view", (!empty($_view) && ($_view === "dash" || $_view ===
 /***************  Set additional end body JS import and Conditional JS  *******************/
 Trace::add_step(__FILE__,"Define conditional js libs for end body section");
 $Page->include_js(array(
-    GPATH_LIB_JS."dropzone.js",
     GPATH_LIB_JS."app.js"
 ), false);
    
@@ -74,65 +81,50 @@ Trace::add_step(__FILE__,"Load page HTML");
 
 
 ?>
-    
-<section class='admin-top-bar'>
-    Top
-</section>
+<?php
+    include_once PATH_PAGES."admin".DS."page-struct-top.php";
+?>
 <section class='container-fluid'>
     <div class="row">
-        <div class='admin-left-bar col-fixed-240'>
+        <div class='admin-right-bar col-fixed-240'>
             <?php 
                 $tabs = array(
-                    "dash"      => ($Page->variable("load-view") === "dash")?"nav-active":"",
-                    "users"     => ($Page->variable("load-view") === "users")?"nav-active":"",
-                    "share"     => ($Page->variable("load-view") === "share")?"nav-active":"",
-                    "stats"     => ($Page->variable("load-view") === "stats")?"nav-active":"",
-                    "maintain"  => ($Page->variable("load-view") === "maintain")?"nav-active":"",
-                    "frontend"  => ($Page->variable("load-view") === "frontend")?"nav-active":"",
-                    "adver"     => ($Page->variable("load-view") === "adver")?"nav-active":""
+                    "dash"           => ($Page->variable("load-view") === "dash")?"nav-active":"",
+                    "makereport"     => ($Page->variable("load-view") === "makereport")?"nav-active":"",
+                    "showreport"     => ($Page->variable("load-view") === "showreport")?"nav-active":"",
+                    "stats"          => ($Page->variable("load-view") === "stats")?"nav-active":"",
+                    "inventory"      => ($Page->variable("load-view") === "inventory")?"nav-active":""
                 );
             ?>
             <ul class="nav-but">
                 <li class='<?php echo $tabs["dash"]; ?>'>
                     <a href="?page=admin&t=dash">
                         <span class="glyphicon glyphicon-dashboard" aria-hidden="true"></span>
-                        Dashbord
+                        <?php Lang::P("admin_nav_dashboard"); ?>
                     </a>
                 </li>
-                <li class='<?php echo $tabs["users"]; ?>'>
-                    <a href="?page=admin&t=users">
-                        <span class="glyphicon glyphicon-user" aria-hidden="true"></span>
-                        Users
+                <li class='<?php echo $tabs["makereport"]; ?>'>
+                    <a href="?page=admin&t=makereport">
+                        <span class="glyphicon glyphicon-wrench" aria-hidden="true"></span>
+                        <?php Lang::P("admin_nav_makereport"); ?>
                     </a>
                 </li>
-                <li class='<?php echo $tabs["share"]; ?>'>
-                    <a href="?page=admin&t=share">
-                        <span class="glyphicon glyphicon-cog" aria-hidden="true"></span>
-                        Sharing
+                <li class='<?php echo $tabs["showreport"]; ?>'>
+                    <a href="?page=admin&t=showreport">
+                        <span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span>
+                        <?php Lang::P("admin_nav_showreport"); ?>
                     </a>
                 </li>
                 <li class='<?php echo $tabs["stats"]; ?>'>
                     <a href="?page=admin&t=stats">
                         <span class="glyphicon glyphicon-stats" aria-hidden="true"></span>
-                        Statistics
+                        <?php Lang::P("admin_nav_stats"); ?>
                     </a>
                 </li>
-                <li class='<?php echo $tabs["maintain"]; ?>'>
-                    <a href="?page=admin&t=maintain">
-                        <span class="glyphicon glyphicon-wrench" aria-hidden="true"></span>
-                        Maintain
-                    </a>
-                </li>
-                <li class='<?php echo $tabs["frontend"]; ?>'>
-                    <a href="?page=admin&t=frontend">
-                        <span class="glyphicon glyphicon-modal-window" aria-hidden="true"></span>
-                        Frontend
-                    </a>
-                </li>
-                <li class='<?php echo $tabs["adver"]; ?>'>
-                    <a href="?page=admin&t=adver">
-                        <span class="glyphicon glyphicon-gift" aria-hidden="true"></span>
-                        Advertise
+                <li class='<?php echo $tabs["inventory"]; ?>'>
+                    <a href="?page=admin&t=inventory">
+                        <span class="glyphicon glyphicon-asterisk" aria-hidden="true"></span>
+                        <?php Lang::P("admin_nav_inventory"); ?>
                     </a>
                 </li>
             </ul>

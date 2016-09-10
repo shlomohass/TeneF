@@ -11,12 +11,34 @@ $Lang = array(
     "dic"  => array(
     //GENERAL:
         "gen_title_prefix"              => "TeneF | ",
-        "gen_title_for_display"         => "TeneF",
+        "gen_title_for_display"         => "דיווח וניתוח כשירות",
         
     //Login page:
         "login_title"                   => "Login",
         "login_desc"                    => "",
         "login_keys"                    => "",
+    
+    //Admin nav right:
+        "admin_nav_dashboard"           => "שולחן עבודה",
+        "admin_nav_makereport"          => "דיווח כשירות",
+        "admin_nav_showreport"          => "הפק דוח כשירות",
+        "admin_nav_stats"               => "ניתוח כשירות",
+        "admin_nav_inventory"           => "הגדר סדכ",
+    
+    //Page Dashboard:
+        "page_dash_title"               => "שולחן עבודה",
+        
+    //Page Dashboard:
+        "page_makereport_title"         => "דיווח כשירות",
+        
+    //Page Dashboard:
+        "page_showreport_title"         => "הפק דוח כשירות",
+        
+    //Page Dashboard:
+        "page_stats_title"              => "ניתוח כשירות",
+        
+    //Page Dashboard:
+        "page_inventory_title"          => "הגדר סדכ",
         
     //App Page:
         "home_title"                    => "TeneF Home",
@@ -24,9 +46,9 @@ $Lang = array(
         "home_keys"                     => "",
         
     //Admin Pages:
-        "home_title"                    => "TeneF Home",
-        "home_desc"                     => "",
-        "home_keys"                     => ""
+        "admin_title"                    => "ניתוח ודיווח כשירות",
+        "admin_desc"                     => "",
+        "admin_keys"                     => ""
     ),
     
     "js" => array(
