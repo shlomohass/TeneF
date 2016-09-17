@@ -32,7 +32,11 @@ $Lang = array(
         "page_makereport_title"             => "דיווח כשירות",
         "page_makereport_select_unit_label" => "בחר יחידה",
         "page_makereport_select_rep_label"  => "ערוך דוח קודם",
+        "page_makereport_but_load_unit"     => "טען יחידה",
         "page_makereport_but_edit_rep"      => "טען לעריכה",
+        "page_makereport_but_unload_unit"   => "בטל טעינה",
+        "page_makereport_loaded_unit_title" => "יחידה: ",
+        "page_makereport_newRep_title"      => "הוספת דוח חדש לתאריך: ",
         
     //Page Dashboard:
         "page_showreport_title"         => "הפק דוח כשירות",
@@ -82,6 +86,9 @@ $Lang = array(
 
         ),
         "script-admin" => array(
+            
+            //MakeReport window:
+            "makerep_error_load_unit"     => "אירעה שגיאה בעת טעינת יחידה",
             
             //inventory window:
             "inven_modal_but_edit_sadac"            => 'נהל סד"כ',

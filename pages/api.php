@@ -206,6 +206,40 @@ if ( $inputs['type'] !== '' ) {
             }
             
         break;
+        
+        /**** get amlist of unit for report: ****/
+        case "loadunittoreportscreen":
+            //Synth needed:
+            $get = $Api->Func->synth($_REQUEST, array('unit_id'),false);
+            //Validation:
+            if (
+                    empty($get['unit_id'])
+                ||  !is_numeric($get['unit_id'])
+            ) {
+                $Api->error("not-legal");
+            }
+            
+            //User privs:
+            $userGod = $User->is_god();
+            $userListPriv = $User->list_privs();
+            
+            //Logic:
+            $Op = new Operation();
+            $List = $Op->get_unit_am_list_for_report($get['unit_id'], $Api::$conn);
+            $Unit = $Op->get_unit_info($get['unit_id'], $Api::$conn);
+            //Output:
+            if (is_array($List)) {
+               $results = array(
+                   "amlist"     => $List,
+                   "repList"    =>array(),
+                   "ofunit"     => isset($Unit[0]) ? $Unit[0] : array()
+                );
+                $success = "with-results";
+            } else {
+                $Api->error("query");
+            }
+        break;
+        
         //Unknown type - error:
         default : 
             $Api->error("bad-who");
