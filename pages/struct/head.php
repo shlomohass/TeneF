@@ -45,7 +45,7 @@ $use_version = (!empty($Page->version))?"?version=".$Page->version:"";
         if (!empty($Page->get_js_lang())) {
             echo "<script>window['lang'] = { ";
             echo implode(",", array_filter($Page->get_js_lang()));
-            echo " }; </script>";
+            echo " }; window['langHook'] = function(key) { if (typeof window.lang[key] !== 'undefined'){ return window.lang[key]; } return 'lang?';}; </script>";
         }
         //Load js libs to head:
         foreach ($Page->get_js() as $script) {

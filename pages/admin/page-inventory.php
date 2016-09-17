@@ -16,32 +16,36 @@ $Page->variable("all-units-priv", $User->list_privs());
 <table id="inventory-grid" cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered display" width="100%">
     <thead>
         <tr>
-            <th>מזהה</th>
-            <th>יחידה</th>
-            <th>סוג</th>
-            <th>יחידת בת של</th>
-            <th>מיקום</th>
-            <th>כללי</th>
-            <th>פעולות</th>
+            <th><?php Lang::P("inven_table_header_id"); ?></th>
+            <th><?php Lang::P("inven_table_header_unit"); ?></th>
+            <th><?php Lang::P("inven_table_header_type"); ?></th>
+            <th><?php Lang::P("inven_table_header_ofunit"); ?></th>
+            <th><?php Lang::P("inven_table_header_place"); ?></th>
+            <th><?php Lang::P("inven_table_header_gen"); ?></th>
+            <th><?php Lang::P("inven_table_header_actions"); ?></th>
         </tr>
     </thead>
 </table>
 
 <div id="manage_sadac" class='modalTeneF'>
     <div class="modalTeneF_wrap">
-        <div class='modalTeneF_head'>עדכון סד"כ: <span class="highlighted_name">יחידה</span></div>
+        <div class='modalTeneF_head'><?php Lang::P("inven_modal_gen_header"); ?><span class="highlighted_name"></span></div>
         <div class='modalTeneF_bodyFixed'>
             <div class="add_sadac_form">
-                <h4><span class="glyphicon glyphicon-plus" aria-hidden="true"></span>הוסף:</h4>
+                <h4><span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+                    <?php Lang::P("inven_modal_addam_header"); ?>
+                </h4>
                 <form id="add_sadac_form"class="form-inline">
                   <div class="form-group">
-                    <label for="zid">צ':</label>
-                    <input type="text" class="form-control" id="zid" placeholder="999999">
+                    <label for="zid">
+                        <?php Lang::P("inven_modal_input_label_am_id"); ?>
+                      </label>
+                    <input type="text" class="form-control" id="zid" placeholder="<?php Lang::P("inven_modal_input_placeholder_am_id"); ?>">
                   </div>
                   <div class="form-group">
                     <label for="ztype" style='margin-bottom:0px;'>
-                        סוג:
-                        <select type="email" class="" dir='rtl' lang='he' style='min-width:150px;' id="ztype" placeholder="">
+                        <?php Lang::P("inven_modal_input_label_am_type"); ?>
+                        <select class="" dir='rtl' lang='he' style='width:150px;' id="ztype" placeholder="">
                             <?php
                                 foreach ($Page->variable("all-am-groups") as $group) {
                                     echo "<optgroup label='".$group["am_group_name"]."'>";
@@ -56,15 +60,21 @@ $Page->variable("all-units-priv", $User->list_privs());
                         </select>
                     </label>
                   </div>
-                    <div class="form-group">
-                    <label for="zyeud">ייעוד:</label>
-                    <input type="email" class="form-control" id="zyeud" placeholder="ייעוד">
+                  <div class="form-group">
+                    <label for="zyeud">
+                        <?php Lang::P("inven_modal_input_label_am_yeud"); ?>
+                    </label>
+                    <input type="email" class="form-control" id="zyeud" placeholder="<?php Lang::P("inven_modal_input_placeholder_am_yeud"); ?>">
                   </div>
-                  <button type="button" class="btn btn-primary" onclick="window.manage_sadac.addToAmList(this);">הוסף</button>
+                  <button type="button" class="btn btn-primary addambutton" onclick="window.manage_sadac.addToAmList(this);">
+                      <?php Lang::P("inven_modal_but_add_am"); ?>
+                  </button>
                 </form>
             </div>
             <br />
-            <h4><span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span>סד"כ מוזן:</h4>
+            <h4><span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span>
+                <?php Lang::P("inven_modal_amlist_header"); ?>
+            </h4>
         </div>
         <div class='modalTeneF_body'>
             <div class='show_sadac'>
@@ -72,8 +82,9 @@ $Page->variable("all-units-priv", $User->list_privs());
             </div>
         </div>
         <div class='modalTeneF_foot'>
-            <button type="button" class="btn btn-primary">הזן ושמור שינויים</button>
-            <button type="button" class="btn btn-warning" onclick="window.manage_sadac.disManageModal()">סגור ואל תשמור</button>
+            <button type="button" class="btn btn-primary" onclick="window.manage_sadac.disManageModal()">
+                <?php Lang::P("inven_modal_but_close_ammodal"); ?>
+            </button>
         </div>
     </div>
 </div>
@@ -99,16 +110,20 @@ $Page->variable("all-units-priv", $User->list_privs());
                         }
                         json.data[i][6] = "";
                         if (has_edit_am) {
-                            json.data[i][6] += '<button class="manage_amlah_but">נהל סד"כ</button>';
+                            json.data[i][6] += '<button class="manage_amlah_but" data-uid="' + u_id + '">' + window.langHook("inven_modal_but_edit_sadac") + '</button>';
                         }
                         if (has_edit_units) {
-                            json.data[i][6] += '<button>מחק יחידה</button><button>עדכן יחידה</button>';
+                            json.data[i][6] += '<button>' + window.langHook("inven_modal_but_erase_unit") + '</button>' + 
+                                               '<button>' + window.langHook("inven_modal_but_edit_unit") + '</button>';
                         }
                     }
                 }
                 if (typeof json.user_god !== 'undefined' && json.user_god) {
                     for (var i = 0; i < json.data.length; i++) {
-                        json.data[i][6] = '<button class="manage_amlah_but">נהל סד"כ</button><button>מחק יחידה</button><button>עדכן יחידה</button>';
+                        var u_id = json.data[i][0];
+                        json.data[i][6] = '<button class="manage_amlah_but" data-uid="' + u_id + '">' + window.langHook("inven_modal_but_edit_sadac") + '</button>'+
+                                          '<button>' + window.langHook("inven_modal_but_erase_unit") + '</button>' + 
+                                          '<button>' + window.langHook("inven_modal_but_edit_unit") + '</button>';
                     }
                 }
             
@@ -162,6 +177,9 @@ $Page->variable("all-units-priv", $User->list_privs());
             //Set Title:
             $modal.find('.highlighted_name').text(unitName);
             
+            //Set add but id:
+            $modal.find('.addambutton').data('uid', unitId);
+            
             //Load Amlah list:
             window.manage_sadac.refreshManageAmlahList(
                 unitId,
@@ -174,9 +192,17 @@ $Page->variable("all-units-priv", $User->list_privs());
             $("#manage_sadac").fadeOut();
         },
         getAmlistHtmlRepresentation : function(obj, priv) {
-            var retHtml = "<table class='amlist_quick_view'><tr><th>מס צ'</th><th>סוג</th><th>ייעוד / שייכות</th><th>פעולות</th></tr>";
+            prev_group = "";
+            var retHtml = "<table class='amlist_quick_view'><tr><th>" + window.langHook("header_table_units_amnum") + "</th>" + 
+                                                                "<th>" + window.langHook("header_table_units_amtype") + "</th>" + 
+                                                                "<th>" + window.langHook("header_table_units_amyeud") + "</th>" + 
+                                                                "<th>" + window.langHook("header_table_units_amactions") + "</th></tr>";
             if (obj.length > 0) {
                 for (var i = 0; i < obj.length; i++) {
+                    if (obj[i].am_group_name !== prev_group) {
+                        prev_group = obj[i].am_group_name;
+                        retHtml += "<tr><td colspan='4' class='amlist_amgroup_row'>" + prev_group + "</td></tr>";
+                    }
                     retHtml += "<tr><td>" + obj[i].am_list_number + "</td><td>" + obj[i].am_type_name + "</td><td>" + obj[i].am_list_yeud + "</td>";
                     if (priv) {
                         retHtml += "<td><span class='glyphicon glyphicon-trash' onclick='' data-amid='" + obj[i].am_list_id + "'></span>" + 
@@ -186,7 +212,7 @@ $Page->variable("all-units-priv", $User->list_privs());
                     }
                 }
             } else {
-                retHtml += "<tr><td colspan='4'>אין סדכ מוזן ליחידה זאת</td></tr>"
+                retHtml += "<tr><td colspan='4'>" + window.langHook("header_table_units_amnodata") + "</td></tr>";
             }
             retHtml += "</table>";
             return retHtml;
@@ -217,26 +243,56 @@ $Page->variable("all-units-priv", $User->list_privs());
                         );
                         callAfter();
                     } else {
-                        //Error:
+                        window.alertModal("שגיאה",window.langHook("err_load_units_amlist"));
                     }
                 },
                 error: function(xhr, ajaxOptions, thrownError){
                     console.log(thrownError);
+                    window.alertModal("שגיאה",window.langHook("err_load_units_amlist"));
                 },
             });
         },
         addToAmList : function(t) {
-            $ele = $(t);
+            var $ele = $(t);
+            var $form = $ele.closest('form');
             var data = {
-                 req:"api",
-                 token:$("#pagetoken").val(),
-                 type:"addamtounit",
-                 unit_id:0,
-                 amnum:0,
-                 amtype:0,
-                 amyeud:""
+                 req:       "api",
+                 token:     $("#pagetoken").val(),
+                 type:      "addamtounit",
+                 unit_id:   $ele.data('uid'),
+                 amnum:     $form.find("#zid").val(),
+                 amtype:    $form.find("#ztype").val(),
+                 amyeud:    $form.find("#zyeud").val()
             };
-            console.log(data);
+            $.ajax({
+                url: 'index.php',  //Server script to process data
+                type: 'POST',
+                data: data,
+                dataType: 'json',             
+                beforeSend: function() {
+                    $ele.prop("disabled", true);
+                },
+                success: function(response) {
+                    if (
+                        typeof response === 'object' && 
+                        typeof response.code !== 'undefined' &&
+                        response.code == "202"
+                    ) {
+                        $form.find("#zid").val("");
+                        $form.find("#zyeud").val("");
+                        window.manage_sadac.refreshManageAmlahList($ele.data('uid'),function(){});
+                    } else {
+                        console.log("fail",response);
+                        window.alertModal("שגיאה",window.langHook("err_save_units_amlist"));
+                    }
+                    $ele.prop("disabled", false);
+                },
+                error: function(xhr, ajaxOptions, thrownError){
+                    $ele.prop("disabled", false);
+                    console.log(thrownError);
+                    window.alertModal("שגיאה",window.langHook("err_save_units_amlist"));
+                },
+            });
         }
     };
     

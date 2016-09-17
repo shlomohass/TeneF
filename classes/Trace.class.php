@@ -215,7 +215,7 @@ class Trace {
     }
     private static function get_expose_styles() {
         return array(
-            'wrapper'       => "style='background:#F2F2F2; border-top:1px solid #A4A4A4; margin:0; padding:0; display: block; z-index:1000; "
+            'wrapper'       => "style='direction:ltr; background:#F2F2F2; border-top:1px solid #A4A4A4; margin:0; padding:0; display: block; z-index:1000; "
                               ."position:fixed; width:100%; bottom:0; font-size:14px; font-family:arial; -webkit-box-shadow:0px -5px 9px -3px #424242; "
                               ." -moz-box-shadow:0px -5px 9px -3px #424242; box-shadow: 0px -5px 9px -3px rgba(66,66,66,0.8);'",
             'toggle'        => "style='padding:0; margin:0; display:none;'",

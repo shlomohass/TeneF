@@ -53,6 +53,18 @@ body {
 }
 
 /*************************************************************
+ *  modal-tene :
+ *************************************************************/
+.modal-tene {
+    
+}
+.modal-tene .modal-title {
+    
+}
+.modal-tene .modal-body {
+    
+}
+/*************************************************************
  * Admin- top :
  *************************************************************/
 .admin-top-bar {
@@ -180,12 +192,14 @@ body {
 .modalTeneF .modalTeneF_wrap .modalTeneF_bodyFixed {
     background-color: white;
     padding: 20px;
+    padding-bottom: 5px;
 }
 .modalTeneF .modalTeneF_wrap .modalTeneF_body {
     height: 50vh;
     background-color: white;
     padding: 20px;
     padding-top: 0px;
+    overflow-y: auto;
 }
 .modalTeneF .modalTeneF_wrap .modalTeneF_foot {
     padding: 10px;
@@ -227,6 +241,19 @@ body {
     float:left;
     margin-right: 12px;
     cursor:pointer;
+}
+.modalTeneF .modalTeneF_wrap .amlist_quick_view tr td.amlist_amgroup_row {
+    background-color: #ffecc3;
+    font-weight: bold;
+}
+/*************************************************************
+ * Page Make Report :
+ *************************************************************/
+.makerep_prev_report {
+    padding-bottom: 15px;
+    padding-top: 15px;
+    border-bottom: 1px solid #e0e0e0;
+    border-top: 1px solid #e0e0e0;
 }
 /*************************************************************
  * Spacers :

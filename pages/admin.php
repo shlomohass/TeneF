@@ -30,7 +30,7 @@ $Page->include_js(array(
 
 /****************************** Include JS Lang hooks ***********************************/
 Trace::add_step(__FILE__,"Load page js lang hooks");
-$Page->set_js_lang(Lang::lang_hook_js("script-frontend"));
+$Page->set_js_lang(Lang::lang_hook_js("script-admin"));
 
 
 
@@ -140,7 +140,7 @@ Trace::add_step(__FILE__,"Load page HTML");
 <!-- START Footer loader -->
 <?php 
 Trace::add_step(__FILE__,"Load page footer");
-//require_once PATH_STRUCT.'modals.php'; 
+require_once PATH_STRUCT.'modals.php'; 
 require_once PATH_STRUCT.'foot.php'; 
 ?> 
 <!-- END Footer loader -->

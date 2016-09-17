@@ -14,12 +14,44 @@ class Operation {
     
     public function get_unit_am_list($unitId, $conn) {
         $results = $conn->get_joined(
-            array(array("LEFT","amlah_list.am_list_of_type","amlah_type.am_type_id")), 
-            "`amlah_list`.`am_list_id`, `amlah_list`.`am_list_number`, `amlah_list`.`am_list_yeud`, `amlah_type`.`am_type_name`",
+            array(
+                array("LEFT JOIN","amlah_list.am_list_of_type","amlah_type.am_type_id"), 
+                array("LEFT JOIN","amlah_type.am_type_of_group","amlah_group.am_group_id")
+            ), 
+            "`amlah_list`.`am_list_id`, 
+             `amlah_list`.`am_list_number`, 
+             `amlah_list`.`am_list_yeud`, 
+             `amlah_type`.`am_type_name`, 
+             `amlah_type`.`am_type_of_group`, 
+             `amlah_group`.`am_group_name`,
+             `amlah_group`.`am_group_display_order`
+            ",
             "`amlah_list`.`am_list_of_unit` = ".$conn->filter($unitId),
             false,
-            array(array("amlah_type.am_type_name"),"DESC")
+            array(
+                array("amlah_group.am_group_display_order", "amlah_type.am_type_name"),
+                "ASC"
+            )
         );
         return (!empty($results))?$results:array();
     }
+    
+    
+    
+    public function add_am_to_unit($conn, $am_num, $am_type, $am_yeud, $unit_id, $by_user) {
+        return $conn->insert_safe(
+            "amlah_list",
+            array(
+                "am_list_number"    => $am_num,
+                "am_list_yeud"      => $am_yeud,
+                "am_list_of_type"   => $am_type,
+                "am_list_status"    => 1,
+                "am_list_of_unit"   => $unit_id,
+                "am_list_added_by"  => $by_user
+            )
+        );
+    }
 }
+/*
+
+*/

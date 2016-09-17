@@ -56,6 +56,7 @@ if ( $inputs['type'] !== '' ) {
             }
         break;
         
+        /**** Get Unit List for user display: ****/
         case "listmanageunits":
             $get = $Api->Func->synth($_REQUEST, array('draw','columns','order','start','length','search'),false);
             $get["order"] = (isset($_REQUEST["order"]) && is_array($_REQUEST["order"]))?$_REQUEST["order"]:"";
@@ -155,7 +156,56 @@ if ( $inputs['type'] !== '' ) {
             echo json_encode($results); 
             die();
         break;
+
+        /**** Add amlah to unit: ****/
+        case "addamtounit":
             
+            //Synth needed:
+            $get = $Api->Func->synth($_REQUEST, array('amnum','amtype','amyeud','unit_id'),false);
+            //Validation:
+            if (
+                    empty($get['amnum'])
+                ||  !is_numeric($get['amnum'])
+                ||  empty($get['amtype'])
+                ||  !is_numeric($get['amtype'])
+                ||  empty($get['unit_id'])
+                ||  !is_numeric($get['unit_id'])
+                ||  empty($get['amyeud'])
+            ) {
+                $Api->error("not-legal");
+            }
+            
+            //User privs:
+            $userGod = $User->is_god();
+            $amTypes = $Api::$conn->get("amlah_type");
+            
+            //More validation - user privs:
+            if (!$userGod) {
+                $userPrivsOnUnit = $User->check_privs_on_unit($get['unit_id']);
+                if (!$userPrivsOnUnit['has'] || !$userPrivsOnUnit['am']) {
+                    $Api->error("no-priv");
+                } 
+            }
+            //More validation - data types:
+            
+            //Params:
+            $added = false;
+            $Op = new Operation();
+            //Logic:
+            $added = $Op->add_am_to_unit($Api::$conn, $get['amnum'], $get['amtype'], $get['amyeud'], $get['unit_id'], $User->user_info);
+            
+            //Output:
+            if ($added) {
+               $results = array(
+                   "amAdded" => $get,
+                   "ofunit" => $get['unit_id']
+                );
+                $success = "with-results";
+            } else {
+                $Api->error("query");
+            }
+            
+        break;
         //Unknown type - error:
         default : 
             $Api->error("bad-who");

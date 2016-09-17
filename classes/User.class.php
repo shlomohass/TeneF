@@ -283,4 +283,25 @@ class User extends Basic {
                 "am"    => false,
             );
     }
+    
+    public function get_user_units() {
+        $where = false;
+        if (!$this->is_god()) {
+            $userListPriv = $User->list_privs();
+            $where = array();
+            if (!empty($userListPriv)) {
+                foreach ($userListPriv as $priv) {
+                    $where[] = "`unit_id` = ".$priv['priv_on_unit']. " ";
+                }
+                $where = implode("OR ",$where );
+            } else {
+                return array();
+            }
+        }
+        return self::$conn->select(
+            "unit_list", 
+            " `unit_id`,`unit_name`,`unit_type`",
+            $where
+        );
+    }
 }
