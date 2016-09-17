@@ -80,7 +80,7 @@ if ( $inputs['type'] !== '' ) {
             $userGod = $User->is_god();
             $userListPriv = $User->list_privs();
             
-            //The Data set
+            //The Data set:
             $where = false;
             if( !empty($get['search']['value']) ) {
                $where = array();
@@ -107,40 +107,22 @@ if ( $inputs['type'] !== '' ) {
             );
             
             //Filter by priv
+            $temp_buf = array();
             if (!$userGod && is_array($data)) {
                 foreach ($data as $key => $unit) {
-                    if ($unit['unit_id'])
+                    $has_unit = $Api->Func->search_by_value_pair($userListPriv, "priv_on_unit", $unit['unit_id'], "priv_user");
+                    if ($has_unit) {
+                        $temp_buf[] = $unit;
+                    }
                 } 
+                $data = $temp_buf;
             }
             
             //The count:
             $totalData = $Api::$conn->num_rows("SELECT * FROM `unit_list`");
             $totalFiltered = $totalData;
             
-            $where = false;
-            if( !empty($get['search']['value']) ) {
-               $where = array();
-               foreach($columns as $col) {
-                   $where[] = "`".$col."` LIKE '".$Api::$conn->filter($get['search']['value'])."%' ";
-               }
-               $where = implode("OR ", $where);
-            }
-            $data = $Api::$conn->get_joined(
-                    array(
-                       array('LEFT', 'unit_list.unit_location','location.loc_id')
-                    ), 
-                    " `unit_id`,`unit_name`,`unit_type`,`unit_of`,`loc_name`,`unit_info` ",
-                    $where,
-                    false,
-                    array(
-                        $get['order'][0]['dir'],
-                        array($columns[$get['order'][0]['column']])
-                    ),
-                    array(
-                        $get['start'],
-                        $get['length']
-                    )
-                );
+            //Create the data set:
             $final_data = array();
             if (is_array($data)) {
                 
@@ -166,11 +148,14 @@ if ( $inputs['type'] !== '' ) {
                 "draw"            => intval( $get['draw'] ), 
                 "recordsTotal"    => intval( $totalData ),  // total number of records
                 "recordsFiltered" => intval( $totalFiltered ), // total number of records after searching, if there is no searching then totalFiltered = totalData
-                "data"            => $final_data   // total data array
+                "data"            => $final_data,   // total data array
+                "user_priv"       => $userListPriv,
+                "user_god"        => $userGod
 			);
             echo json_encode($results); 
             die();
         break;
+            
         //Unknown type - error:
         default : 
             $Api->error("bad-who");

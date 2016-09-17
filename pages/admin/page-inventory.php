@@ -60,7 +60,7 @@ $Page->variable("all-units-priv", $User->list_privs());
                     <label for="zyeud">ייעוד:</label>
                     <input type="email" class="form-control" id="zyeud" placeholder="ייעוד">
                   </div>
-                  <button type="submit" class="btn btn-primary">הוסף</button>
+                  <button type="button" class="btn btn-primary" onclick="window.manage_sadac.addToAmList(this);">הוסף</button>
                 </form>
             </div>
             <br />
@@ -78,45 +78,76 @@ $Page->variable("all-units-priv", $User->list_privs());
     </div>
 </div>
 <script type="text/javascript" language="javascript" >
-    var dataTable = $('#inventory-grid').DataTable( {
-        "processing": true,
-        "serverSide": true,
-        "language": {
-            paginate: {
-                previous: '‹ הקודם',
-                next:     'הבא ›'
-            },
-            aria: {
-                paginate: {
-                    previous: 'Previous',
-                    next:     'Next'
+    var dataTable = $('#inventory-grid')
+        .on('xhr.dt', function ( e, settings, json, xhr ) {
+                
+                //Override actions by user priviliges:
+                if (typeof json.user_god !== 'undefined' && typeof json.user_priv !== 'undefined' && !json.user_god) {
+                    for (var i = 0; i < json.data.length; i++) {
+                        var u_id = json.data[i][0];
+                        var has_edit_units = false;
+                        var has_edit_am = false;
+                        for (var j = 0; j < json.user_priv.length; j++) {
+                            if (json.user_priv[j].priv_on_unit === u_id) {
+                                if (json.user_priv[j].user_can_edit_amlah == 1) {
+                                    has_edit_am = true;
+                                }
+                                if (json.user_priv[j].user_can_edit_units == 1) {
+                                    has_edit_units = true;
+                                }
+                            }
+                        }
+                        json.data[i][6] = "";
+                        if (has_edit_am) {
+                            json.data[i][6] += '<button class="manage_amlah_but">נהל סד"כ</button>';
+                        }
+                        if (has_edit_units) {
+                            json.data[i][6] += '<button>מחק יחידה</button><button>עדכן יחידה</button>';
+                        }
+                    }
                 }
-            },
-            info: "מציג _START_ עד _END_ מתוך _TOTAL_ רשומות",
-            lengthMenu: "הצג _MENU_ רשומות",
-            search:         "חפש: ",
-        },
-        "columnDefs": [{
-            "targets": -1,
-            "width":"200px",
-            "data": null,
-            "defaultContent": '<button class="manage_amlah_but">נהל סד"כ</button><button>מחק יחידה</button><button>עדכן יחידה</button>'
-        }],
-        "ajax":{
-            url : "index.php",
-            type: "post",
-            data: function ( d ) {
-                    return $.extend( {}, d, {
-                            req:"api",
-                            token:$("#pagetoken").val(),
-                            type:"listmanageunits"
-                        } ); 
-            },
-            error: function(err, ms){  // error handling
-                console.log("error",err);
-            }
-        }
-    } );
+                if (typeof json.user_god !== 'undefined' && json.user_god) {
+                    for (var i = 0; i < json.data.length; i++) {
+                        json.data[i][6] = '<button class="manage_amlah_but">נהל סד"כ</button><button>מחק יחידה</button><button>עדכן יחידה</button>';
+                    }
+                }
+            
+            }).DataTable( {
+                "processing": true,
+                "serverSide": true,
+                "language": {
+                    paginate: {
+                        previous: '‹ הקודם',
+                        next:     'הבא ›'
+                    },
+                    aria: {
+                        paginate: {
+                            previous: 'Previous',
+                            next:     'Next'
+                        }
+                    },
+                    info: "מציג _START_ עד _END_ מתוך _TOTAL_ רשומות",
+                    lengthMenu: "הצג _MENU_ רשומות",
+                    search:         "חפש: ",
+                },
+                columnDefs: [
+                    {bSortable: false, targets: [-1,-2]} 
+                ],
+                "ajax":{
+                    url : "index.php",
+                    type: "post",
+                    data: function ( d ) {
+                            return $.extend( {}, d, {
+                                    req:"api",
+                                    token:$("#pagetoken").val(),
+                                    type:"listmanageunits"
+                                } ); 
+                    },
+                    error: function(err, ms){  // error handling
+                        console.log("error",err);
+                    }
+                }
+            } );
     
     window["manage_sadac"] = {
         
@@ -193,6 +224,19 @@ $Page->variable("all-units-priv", $User->list_privs());
                     console.log(thrownError);
                 },
             });
+        },
+        addToAmList : function(t) {
+            $ele = $(t);
+            var data = {
+                 req:"api",
+                 token:$("#pagetoken").val(),
+                 type:"addamtounit",
+                 unit_id:0,
+                 amnum:0,
+                 amtype:0,
+                 amyeud:""
+            };
+            console.log(data);
         }
     };
     
