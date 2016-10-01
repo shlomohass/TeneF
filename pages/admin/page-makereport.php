@@ -133,7 +133,7 @@ Trace::reg_var("all-am-status",$Page->variable("all-am-status"));
                                     <option value="-1">ללא</option>
                                     <?php
                                         foreach ($Page->variable("all-am-status") as $status) {
-                                            echo "<option value='".$status["am_status_name"]."'>".$status["am_status_name"]."</option>";
+                                            echo "<option value='".$status["am_status_id"]."' data-setcolor='".$status["am_status_color"]."'>".$status["am_status_name"]."</option>";
                                         }
                                     ?>
                                 </select>
@@ -151,57 +151,7 @@ Trace::reg_var("all-am-status",$Page->variable("all-am-status"));
                             </div>
                         </td>
                     </tr>
-                    <tr>
-                        <td>654665</td>
-                        <td>דוד</td>
-                        <td>חפ"ק</td>
-                        <td>מפגש</td>
-                        <td>כשיר</td>
-                        <td>בעיית גיר והנעה</td>
-                        <td>היסטוריית כשירות</td>
-                        <td>הערות הולכות כאן</td>
-                    </tr>
-                    <tr>
-                        <td>654665</td>
-                        <td>דוד</td>
-                        <td>חפ"ק</td>
-                        <td>מפגש</td>
-                        <td>כשיר</td>
-                        <td>בעיית גיר והנעה</td>
-                        <td>היסטוריית כשירות</td>
-                        <td>הערות הולכות כאן</td>
-                    </tr>
-                    <tr>
-                        <td>654665</td>
-                        <td>דוד</td>
-                        <td>חפ"ק</td>
-                        <td>מפגש</td>
-                        <td>כשיר</td>
-                        <td>בעיית גיר והנעה</td>
-                        <td>היסטוריית כשירות</td>
-                        <td>הערות הולכות כאן</td>
-                    </tr>
-                    <tr>
-                        <td>654665</td>
-                        <td>דוד</td>
-                        <td>חפ"ק</td>
-                        <td>מפגש</td>
-                        <td>כשיר</td>
-                        <td>בעיית גיר והנעה</td>
-                        <td>היסטוריית כשירות</td>
-                        <td>הערות הולכות כאן</td>
-                    </tr>
-                    <tr>
-                        <td>654665</td>
-                        <td>דוד</td>
-                        <td>חפ"ק</td>
-                        <td>מפגש</td>
-                        <td>כשיר</td>
-                        <td>בעיית גיר והנעה</td>
-                        <td>היסטוריית כשירות</td>
-                        <td>הערות הולכות כאן</td>
-                    </tr>
-                    <tr>
+                    <tr class="amRow">
                         <td>654665</td>
                         <td>דוד</td>
                         <td>חפ"ק</td>
@@ -269,6 +219,40 @@ Trace::reg_var("all-am-status",$Page->variable("all-am-status"));
                         $prev.html($htmlPrev.join("")).select2();
                         
                         //Load new:
+                        var $table = $(".new_rep_table tbody").eq(0);
+                        var $htmlRows = [];
+                        for (var i=0; i < response.results.amlist.length; i++) {
+                            
+                            //Set status box:
+                            var $statusSelect = $("#tene-filter-amstatus").clone().attr("id","").addClass("status-select-rep").find("option").prop("selected",false).end();
+                            $statusSelect.find("option[value=" + response.results.amlist[i].am_list_status + "]").attr('selected',"selected");
+                            $htmlRows.push(
+                                "<tr class='amRow'>"
+                                + "<td>" + response.results.amlist[i].am_list_number + "</td>"
+                                + "<td>" + response.results.amlist[i].am_type_name + "</td>"
+                                + "<td>" + response.results.amlist[i].am_list_yeud + "</td>"
+                                + "<td>" + response.results.amlist[i].loc_name + "</td>"
+                                + "<td>" + $statusSelect[0].outerHTML + "</td>"
+                                + "<td>" + response.results.amlist[i].am_list_status_exp + "</td>"
+                                + "<td>" + response.results.amlist[i].am_list_status_exp_log + "</td>"
+                                + "<td></td>"
+                                + "</tr>"
+                            );
+                        }
+                        $table.append($htmlRows.join(""));
+                        
+                        //Append Change Status:
+                        $table.find(".status-select-rep").each(function(inde,ele){
+                            var $ele = $(ele);
+                            $ele.change(function(){
+                                var $e = $(this);
+                                var $td = $e.closest("td");
+                                var $opt = $e.find("option:selected");
+                                var color = $opt.data("setcolor");
+                                $td.css("backgroundColor",color);
+                            });
+                            $ele.change();
+                        });
                         
                         //Load inputs:
                         window.teneReport.loadautocompletes();
@@ -277,6 +261,7 @@ Trace::reg_var("all-am-status",$Page->variable("all-am-status"));
                         $(".makerep_loaded_unit_title").fadeIn(function(){
                             $(".makerep_prev_report, .makerep_new_report").fadeIn();
                         });
+                        
                     } else {
                         console.log("fail",response);
                         window.alertModal("שגיאה",window.langHook("makerep_error_load_unit"));
@@ -297,6 +282,7 @@ Trace::reg_var("all-am-status",$Page->variable("all-am-status"));
             $('#make_but_load_unit').prop("disabled", false);
             $('#makereport_unit_set').prop("disabled", false);
             $(".makerep_prev_report, .makerep_new_report, .makerep_loaded_unit_title").fadeOut(function(){
+                $(".new_rep_table tbody .amRow").remove();
             });
         },
         loadautocompletes : function() {
@@ -318,11 +304,11 @@ Trace::reg_var("all-am-status",$Page->variable("all-am-status"));
             var source_location_clean   = window.teneReport.arrayUnique(source_location);
             var source_exp_clean        = window.teneReport.arrayUnique(source_exp);
             var source_com_clean        = window.teneReport.arrayUnique(source_com);
-            $("#tene-filter-amnum").typeahead({ source:source_amnum_clean });
-            $("#tene-filter-yeud").typeahead({ source:source_yeud_clean });
-            $("#tene-filter-location").typeahead({ source:source_location_clean });
-            $("#tene-filter-exp").typeahead({ source:source_exp_clean });
-            $("#tene-filter-comment").typeahead({ source:source_com_clean });
+            $("#tene-filter-amnum").typeahead({ source:source_amnum_clean, fitToElement:true });
+            $("#tene-filter-yeud").typeahead({ source:source_yeud_clean, fitToElement:true });
+            $("#tene-filter-location").typeahead({ source:source_location_clean, fitToElement:true });
+            $("#tene-filter-exp").typeahead({ source:source_exp_clean, fitToElement:true });
+            $("#tene-filter-comment").typeahead({ source:source_com_clean, fitToElement:true });
         },
         arrayUnique : function(a) {
             return a.reduce(function(p, c) {

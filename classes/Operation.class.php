@@ -60,8 +60,9 @@ class Operation {
         $results = $conn->get_joined(
             array(
                 array("LEFT JOIN","amlah_list.am_list_of_type","amlah_type.am_type_id"), 
+                array("LEFT JOIN","amlah_list.am_list_location","location.loc_id"),
                 array("LEFT JOIN","amlah_type.am_type_of_group","amlah_group.am_group_id"),
-                array("LEFT JOIN","amlah_list.am_list_location","location.loc_name")
+                array("LEFT JOIN","amlah_list.am_list_status","amlah_status.am_status_id")
             ), 
             "`amlah_list`.`am_list_id`, 
              `amlah_list`.`am_list_number`, 
@@ -73,6 +74,8 @@ class Operation {
              `location`.`loc_is_terain`, 
              `location`.`loc_is_civilian`,
              `amlah_list`.`am_list_status`, 
+             `amlah_status`.`am_status_name`, 
+             `amlah_status`.`am_status_color`, 
              `amlah_list`.`am_list_status_exp`, 
              `amlah_list`.`am_list_status_exp_log`, 
              `amlah_type`.`am_type_name`, 

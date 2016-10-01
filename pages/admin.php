@@ -25,7 +25,7 @@ $Page->include_js(array(
     GPATH_LIB_JS."bootstrap.min.js",
     GPATH_LIB_JS."datatables/jquery.dataTables.js",
     GPATH_LIB_JS."datatables/dataTables.bootstrap.js",
-    GPATH_LIB_JS."typeahead.min.js",
+    GPATH_LIB_JS."typeahead.js",
     GPATH_LIB_JS."selectjquery/select2.full.min.js"
 ));
 
