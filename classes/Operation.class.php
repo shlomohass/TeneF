@@ -12,6 +12,20 @@ class Operation {
         Trace::add_trace('construct class',__METHOD__);  
     }
     
+    /* Get all the saved location list:
+     * @param $conn -> DB connection.
+     * @return Array()
+     */
+    public function get_location_list($conn) {
+        $results = $conn->get("location");
+        return (!empty($results))?$results:array();
+    }
+
+    /* Get A unit information provide unit ID:
+     * @param $unitId -> Integer.
+     * @param $conn -> DB connection.
+     * @return Array()
+     */
     public function get_unit_info($unitId, $conn) {
         $results = $conn->get_joined(
             array(
@@ -32,6 +46,12 @@ class Operation {
         );
         return (!empty($results))?$results:array();
     }
+    
+    /* Get A unit amlah list provide unit ID:
+     * @param $unitId -> Integer.
+     * @param $conn -> DB connection.
+     * @return Array()
+     */
     public function get_unit_am_list($unitId, $conn) {
         $results = $conn->get_joined(
             array(
@@ -56,6 +76,11 @@ class Operation {
         return (!empty($results))?$results:array();
     }
     
+    /* Get A unit amlah list provide unit ID -> extended:
+     * @param $unitId -> Integer.
+     * @param $conn -> DB connection.
+     * @return Array()
+     */
     public function get_unit_am_list_for_report($unitId, $conn) {
         $results = $conn->get_joined(
             array(
@@ -78,6 +103,7 @@ class Operation {
              `amlah_status`.`am_status_color`, 
              `amlah_list`.`am_list_status_exp`, 
              `amlah_list`.`am_list_status_exp_log`, 
+             `amlah_type`.`am_type_id`,
              `amlah_type`.`am_type_name`, 
              `amlah_type`.`am_type_of_group`, 
              `amlah_group`.`am_group_name`, 
@@ -93,6 +119,15 @@ class Operation {
         return (!empty($results))?$results:array();
     }
     
+    /* Save amlah to unit -> Creates a new amlah row:
+     * @param $conn -> DB connection.
+     * @param $am_num -> String.
+     * @param $am_type -> Integer.
+     * @param $am_yeud -> String.
+     * @param $unit_id -> Integer.
+     * @param $by_user -> Integer.
+     * @return Boolean
+     */
     public function add_am_to_unit($conn, $am_num, $am_type, $am_yeud, $unit_id, $by_user) {
         return $conn->insert_safe(
             "amlah_list",
@@ -106,7 +141,50 @@ class Operation {
             )
         );
     }
-}
-/*
 
-*/
+    /* Check if a location name proposal is unique:
+     * @param $conn -> DB connection.
+     * @param $loc_name -> string.
+     * @return Boolean
+     */
+    public function validate_location_unique($conn, $loc_name) {
+        $test = $conn->select(
+            "location", "* ", array(
+                array(
+                    'loc_name', '=', trim($loc_name)
+                )
+            )
+        );
+        if (empty($test)) {
+            return true;
+        }
+        return false;
+    }
+    
+    /* Save A new Location To DB:
+     * @param $conn -> DB connection.
+     * @param $loc_name -> string.
+     * @param $loc_base -> string.
+     * @param $loc_civil -> string.
+     * @param $loc_terrain -> string.
+     * @param $loc_border -> string.
+     * @return Integer / Boolean
+     */
+    public function add_new_location($conn, $loc_name = "", $loc_base = "", $loc_civil = "", $loc_terrain = "", $loc_border = "") {
+        if (!is_string($loc_name) || empty(trim($loc_name))) {
+            return false;
+        }
+        $input = array(
+            "loc_name"          => trim($loc_name),
+            "loc_is_border"     => (empty($loc_border)?0:1),
+            "loc_is_base"       => (empty($loc_base)?0:1),
+            "loc_is_terain"     => (empty($loc_terrain)?0:1),
+            "loc_is_civilian"   => (empty($loc_civil)?0:1)
+        );
+        $test = $conn->insert_safe("location", $input);
+        if ($test) {
+            return $conn->lastid();
+        }
+        return false;
+    }
+}

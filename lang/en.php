@@ -31,12 +31,27 @@ $Lang = array(
     //Page Make Report:
         "page_makereport_title"             => "דיווח כשירות",
         "page_makereport_select_unit_label" => "בחר יחידה",
-        "page_makereport_select_rep_label"  => "ערוך דוח קודם",
+        "page_makereport_select_rep_label"  => "טען דוח קודם",
         "page_makereport_but_load_unit"     => "טען יחידה",
         "page_makereport_but_edit_rep"      => "טען לעריכה",
         "page_makereport_but_unload_unit"   => "בטל טעינה",
         "page_makereport_loaded_unit_title" => "יחידה: ",
         "page_makereport_newRep_title"      => "הוספת דוח חדש לתאריך: ",
+        "page_makereport_but_create_report" => "הפק דוח כשירות",
+        
+        //Edit location Modal:
+        "page_makereport_modal_header"      => "ערוך מיקום",
+        "page_makereport_modal_header_add"  => "הוסף מיקום",
+        "page_makereport_modal_loc_name_place"  => "הקלד שם",
+        "page_makereport_modal_select_loc_head"  => "בחר מיקום",
+        "page_makereport_modal_but_loc_new"  => "הוסף מיקום וסגור",
+        "page_makereport_modal_but_loc_select"  => "בחר מיקום וסגור",
+        "page_makereport_modal_but_loc_add"  => "סגור עריכת מיקום",
+        "page_makereport_modal_loc_exists"  => "מיקום זה כבר מוזן - אנא בחר את המיקום מלמטה",
+        "page_makereport_label_terrain"     => "שטח",
+        "page_makereport_label_border"      => "גבול",
+        "page_makereport_label_civil"       => "אזרחי",
+        "page_makereport_label_base"        => "בסיס",
         
     //Page Dashboard:
         "page_showreport_title"         => "הפק דוח כשירות",
@@ -88,7 +103,16 @@ $Lang = array(
         "script-admin" => array(
             
             //MakeReport window:
-            "makerep_error_load_unit"     => "אירעה שגיאה בעת טעינת יחידה",
+            "makerep_placeholder_select_unit"       => "בחר יחידה לטעינה",
+            "makerep_placeholder_select_prevrep"    => "בחר דוח קודם",
+            "makerep_warn_select_unit"              => "עליך לבחור יחידה לפני טעינתה",
+            "makerep_error_load_unit"               => "אירעה שגיאה בעת טעינת יחידה",
+            "makerep_error_load_loc"                => "אירעה שגיאה בטיענת רשימת מיקומים",
+            "makerep_placeholder_select_loc"        => "בחר מיקום",
+            "makerep_warn_setlocname"               => "אנא הזן שם מיקום",
+            "makerep_warn_setlocname_exists"        => "מיקום חדש כבר מוזן במערכת בחר מהרשימה מתחת - לא ניתן להזין אותו מיקום.",
+            "makerep_error_savenew_loc"             => "אירעה שגיאה בעת שמירת מיקום חדש במערכת",
+            "makerep_warn_select_loc_empty"         => "עליך לבחור מיקום מהרשימה הנפתחת טרם השמירה",
             
             //inventory window:
             "inven_modal_but_edit_sadac"            => 'נהל סד"כ',

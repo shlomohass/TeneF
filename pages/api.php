@@ -17,6 +17,73 @@ if ( $inputs['type'] !== '' ) {
     
     switch (strtolower($inputs['type'])) {
         
+            
+        /**** List Locations: ****/
+        case "listlocations":  
+            
+            //Logic:
+            $Op = new Operation();
+            
+            $locList = $Op->get_location_list($Api::$conn);
+            
+            //Output:
+            if (is_array($locList)) {
+               $results = array(
+                   "locations" => $locList,
+                );
+                $success = "with-results";
+            } else {
+                $Api->error("results-false");
+            }
+            
+        break;
+        
+        /**** Set new Location: ****/
+        case "addlocation":
+            
+            //Synth needed:
+            $get = $Api->Func->synth($_REQUEST, array('locname','locisbase','lociscivil','locisterrain','locisborder'),false);
+            
+            //Validation input:
+            if (
+                    empty($get['locname'])
+            ) {
+                $Api->error("not-legal");
+            }
+            
+            //Logic:
+            $Op = new Operation();
+            $newLoc = array();
+            
+            //validate:
+            if (!$Op->validate_location_unique($Api::$conn, $get['locname'])) {
+                $Api->error("not-uni");
+            }
+            
+            //Create:
+            $newLoc = $Op->add_new_location($Api::$conn,$get['locname'],$get['locisbase'],$get['lociscivil'],$get['locisterrain'],$get['locisborder']);
+            
+            //Output:
+            if (!empty($newLoc)) {
+               $results = array(
+                   "newloc" => array(
+                        "locname" => trim($get['locname']),
+                        "locid"   => $newLoc  
+                   ),
+                   "from" => array(
+                       "locname" => $get['locname'], 
+                       "locisbase" => $get['locisbase'],
+                       "lociscivil" => $get['lociscivil'],
+                       "locisterrain" => $get['locisterrain'],
+                       "locisborder" => $get['locisborder']
+                   )
+                );
+                $success = "with-results";
+            } else {
+                $Api->error("query");
+            }
+        break;
+            
         /**** Show A unit List of Amlah: ****/
         case "listamlahofunit":  
             
