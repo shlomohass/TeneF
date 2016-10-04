@@ -87,7 +87,8 @@ class Operation {
                 array("LEFT JOIN","amlah_list.am_list_of_type","amlah_type.am_type_id"), 
                 array("LEFT JOIN","amlah_list.am_list_location","location.loc_id"),
                 array("LEFT JOIN","amlah_type.am_type_of_group","amlah_group.am_group_id"),
-                array("LEFT JOIN","amlah_list.am_list_status","amlah_status.am_status_id")
+                array("LEFT JOIN","amlah_list.am_list_status","amlah_status.am_status_id"),
+                array("LEFT JOIN","amlah_list.am_list_dereg","repare_deg.deg_id")
             ), 
             "`amlah_list`.`am_list_id`, 
              `amlah_list`.`am_list_number`, 
@@ -102,7 +103,11 @@ class Operation {
              `amlah_status`.`am_status_name`, 
              `amlah_status`.`am_status_color`, 
              `amlah_list`.`am_list_status_exp`, 
-             `amlah_list`.`am_list_status_exp_log`, 
+             `amlah_list`.`am_list_status_exp_log`,
+             `amlah_list`.`am_list_dereg`, 
+             `repare_deg`.`deg_name`, 
+             `amlah_list`.`am_list_indereg_since`, 
+             `amlah_list`.`am_list_forecast`, 
              `amlah_type`.`am_type_id`,
              `amlah_type`.`am_type_name`, 
              `amlah_type`.`am_type_of_group`, 

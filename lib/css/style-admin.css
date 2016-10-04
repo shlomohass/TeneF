@@ -300,17 +300,24 @@ h4.makerep_loaded_unit_title span {
 .makerep_new_report .new_rep_container .new_rep_table {
     width: 100%;
     margin-top: 8px;
+    font-size: 11px;
+    margin-bottom: 50px;
 }
 .makerep_new_report .new_rep_container .new_rep_table th {
     border: 1px solid #9e9e9e;
     text-align: right;
     padding: 5px;
     background-color: #f1e3ff;
+    font-size: 12px;
+    text-align:center;
 }
 .makerep_new_report .new_rep_container .new_rep_table td {
     border: 1px solid #9e9e9e;
     text-align: right;
     padding: 5px;
+}
+.makerep_new_report .new_rep_container .new_rep_table td .tene-filter {
+    font-size: 12px;   
 }
 .makerep_new_report .new_rep_container .new_rep_table tr:nth-child(even) {
     background-color: #e8e8e8;
@@ -323,6 +330,16 @@ h4.makerep_loaded_unit_title span {
     background-color: transparent;
     box-shadow: none;
     outline: none;
+    font-size: 12px;
+    font-weight: bold;
+}
+.makerep_new_report .new_rep_container .new_rep_table .dereg-select-rep {
+    border: 0;
+    background-color: transparent;
+    box-shadow: none;
+    outline: none;
+    font-size: 12px;
+    font-weight: bold;
 }
 .makerep_new_report .new_rep_container .new_rep_table .amList-status-note,
 .makerep_new_report .new_rep_container .new_rep_table .amList-status-exp {

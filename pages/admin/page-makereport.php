@@ -7,9 +7,10 @@ $Op = new Operation();
 
 //Load all amlah types:
 Trace::add_step(__FILE__,"Loading needed tables");
-$Page->variable("all-am-types", $Page::$conn->get("amlah_type"));
+$Page->variable("all-am-types",  $Page::$conn->get("amlah_type"));
 $Page->variable("all-am-groups", $Page::$conn->get("amlah_group"));
 $Page->variable("all-am-status", $Page::$conn->get("amlah_status"));
+$Page->variable("all-am-dereg",  $Page::$conn->get("repare_deg"));
 
 //Get user privs:
 Trace::add_step(__FILE__,"Loading needed user info");
@@ -27,6 +28,8 @@ Trace::reg_var("user_god",$Page->variable("god"));
 Trace::reg_var("all-am-types",$Page->variable("all-am-types"));
 Trace::reg_var("all-am-groups",$Page->variable("all-am-groups"));
 Trace::reg_var("all-am-status",$Page->variable("all-am-status"));
+Trace::reg_var("all-am-dereg",$Page->variable("all-am-status"));
+
 ?>
 <h2><?php Lang::P("page_makereport_title"); ?></h2>
 <div class="row">
@@ -90,6 +93,10 @@ Trace::reg_var("all-am-status",$Page->variable("all-am-status"));
                         <th>כשירות</th>
                         <th>פירוט מצב כשירות</th>
                         <th>היסטוריית כשירות</th>
+                        <th>חלפים</th>
+                        <th>דרג תיקון</th>
+                        <th>ברישום מתאריך</th>
+                        <th>צפי תיקון</th>
                         <th>הערה</th>
                     </tr>
                 </thead>
@@ -99,12 +106,12 @@ Trace::reg_var("all-am-status",$Page->variable("all-am-status"));
                         </td>
                         <td>
                             <div class="form-group" style="max-width:95px;">
-                                <input type="text" class="tene-filter-rows-intext form-control" id="tene-filter-amnum" placeholder="000000" />
+                                <input type="text" class="tene-filter tene-filter-rows-intext form-control" id="tene-filter-amnum" placeholder="000000" />
                             </div>
                         </td>
                         <td>
                             <div class="form-group">
-                                <select class="tene-filter-rows-indata form-control" id="tene-filter-amtype">
+                                <select class="tene-filter tene-filter-rows-indata form-control" id="tene-filter-amtype">
                                     <option value="-1">ללא</option>
                                     <?php
                                         foreach ($Page->variable("all-am-groups") as $group) {
@@ -122,17 +129,17 @@ Trace::reg_var("all-am-status",$Page->variable("all-am-status"));
                         </td>
                         <td>
                             <div class="form-group">
-                                <input type="text" class="tene-filter-rows-intext form-control" id="tene-filter-yeud" placeholder="סנן יעוד" />
+                                <input type="text" class="tene-filter tene-filter-rows-intext form-control" id="tene-filter-yeud" placeholder="סנן יעוד" />
                             </div>
                         </td>
                         <td>
                             <div class="form-group">
-                                <input type="text" class="tene-filter-rows-intext form-control" id="tene-filter-location" data-provide="typeahead" autocomplete="off" placeholder="סנן מיקום" />
+                                <input type="text" class="tene-filter tene-filter-rows-intext form-control" id="tene-filter-location" data-provide="typeahead" autocomplete="off" placeholder="סנן מיקום" />
                             </div>
                         </td>
                         <td>
                             <div class="form-group">
-                                <select class="tene-filter-rows-inselect form-control" id="tene-filter-amstatus">
+                                <select class="tene-filter tene-filter-rows-inselect form-control" id="tene-filter-amstatus">
                                     <option value="-1">ללא</option>
                                     <?php
                                         foreach ($Page->variable("all-am-status") as $status) {
@@ -144,13 +151,28 @@ Trace::reg_var("all-am-status",$Page->variable("all-am-status"));
                         </td>
                         <td>
                             <div class="form-group">
-                                <input type="text" class="tene-filter-rows-inarea form-control" id="tene-filter-exp" placeholder="חפש פירוט" />
+                                <input type="text" class="tene-filter tene-filter-rows-inarea form-control" id="tene-filter-exp" placeholder="חפש פירוט" />
                             </div>
                         </td>
                         <td></td>
+                        <td></td>
                         <td>
                             <div class="form-group">
-                                <input type="text" class="tene-filter-rows-inarea form-control" id="tene-filter-comment" placeholder="חפש הערות" />
+                                <select class="tene-filter tene-filter-rows-inselect form-control" id="tene-filter-amdereg" style='min-width: 70px;'>
+                                    <option value="-1">ללא</option>
+                                    <?php
+                                        foreach ($Page->variable("all-am-dereg") as $status) {
+                                            echo "<option value='".$status["deg_id"]."'>".$status["deg_name"]."</option>";
+                                        }
+                                    ?>
+                                </select>
+                            </div>
+                        </td>
+                        <td></td>
+                        <td></td>
+                        <td>
+                            <div class="form-group">
+                                <input type="text" class="tene-filter tene-filter-rows-inarea form-control" id="tene-filter-comment" placeholder="חפש הערות" />
                             </div>
                         </td>
                     </tr>
@@ -160,7 +182,7 @@ Trace::reg_var("all-am-status",$Page->variable("all-am-status"));
     </div>
     <div class="clearfix"></div>
 </div>
-
+<!-- manage amlah location modal -->
 <div id="manage_am_location" class='modalTeneF' data-locrowedit="-1">
     <div class="modalTeneF_wrap">
         <div class='modalTeneF_head'><?php Lang::P("page_makereport_modal_header"); ?><span class="highlighted_name"></span></div>
@@ -220,8 +242,9 @@ Trace::reg_var("all-am-status",$Page->variable("all-am-status"));
         </div>
     </div>
 </div>
+
+<!-- page main logic script -->
 <script>
-    
     //Unit select box:
     $("#makereport_unit_set").select2({ 
         allowClear: true,
@@ -316,6 +339,12 @@ Trace::reg_var("all-am-status",$Page->variable("all-am-status"));
     $(document).on("change", ".amList-status-exp", function(){
         window.teneReport.validate_rows_for_changes(true);
     });
+    $(document).on("change", ".dereg-select-rep", function(){
+        window.teneReport.validate_rows_for_changes(true);
+    });
+    $(document).on("click", ".rowIndicator.changed", function(){
+        window.teneReport.restore_row(this);
+    });
     
     //Report Object:
      window["teneReport"] = {
@@ -381,10 +410,18 @@ Trace::reg_var("all-am-status",$Page->variable("all-am-status"));
                             response.results.amlist[i].am_list_yeud = response.results.amlist[i].am_list_yeud === null ? "" : response.results.amlist[i].am_list_yeud;
                             response.results.amlist[i].loc_name = response.results.amlist[i].loc_name === null ? "" : response.results.amlist[i].loc_name;
                             response.results.amlist[i].am_list_location = response.results.amlist[i].am_list_location === null ? 0 : response.results.amlist[i].am_list_location;
+                            response.results.amlist[i].am_list_dereg = response.results.amlist[i].am_list_dereg === null ? -1 : response.results.amlist[i].am_list_dereg;
+                            response.results.amlist[i].am_list_indereg_since = response.results.amlist[i].am_list_indereg_since === null ? "" : response.results.amlist[i].am_list_indereg_since;
+                            response.results.amlist[i].am_list_forecast = response.results.amlist[i].am_list_forecast === null ? "" : response.results.amlist[i].am_list_forecast;
                             
                             //Set status box:
                             var $statusSelect = $("#tene-filter-amstatus").clone().attr("id","").removeClass("tene-filter-rows-inselect").addClass("status-select-rep").find("option").prop("selected",false).end();
                             $statusSelect.find("option[value=" + response.results.amlist[i].am_list_status + "]").attr('selected',"selected");
+                            
+                            // Set Dereg Box:
+                            var $deregSelect = $("#tene-filter-amdereg").clone().attr("id","").removeClass("tene-filter-rows-inselect").addClass("dereg-select-rep").find("option").prop("selected",false).end();
+                            $deregSelect.find("option[value=" + response.results.amlist[i].am_list_dereg + "]").attr('selected',"selected");
+                            
                             $htmlRows.push(
                                 $("<tr class='amRow'>"
                                 + "<td style='width:20px;' class='rowIndicator'></td>"
@@ -395,6 +432,10 @@ Trace::reg_var("all-am-status",$Page->variable("all-am-status"));
                                 + "<td>" + $statusSelect[0].outerHTML + "</td>"
                                 + "<td style='line-height:1px;'><textarea class='amList-status-exp'>" + response.results.amlist[i].am_list_status_exp + "</textarea></td>"
                                 + "<td>" + response.results.amlist[i].am_list_status_exp_log + "</td>"
+                                + "<td></td>"
+                                + "<td>" + $deregSelect[0].outerHTML + "</td>"
+                                + "<td></td>"
+                                + "<td></td>"
                                 + "<td><textarea class='amList-status-note'>" + "</textarea></td>"
                                 + "</tr>")
                                 .data("oldrow", response.results.amlist[i])
@@ -462,7 +503,7 @@ Trace::reg_var("all-am-status",$Page->variable("all-am-status"));
                 source_yeud.push($(ele).find("td").eq(3).text());
                 source_location.push($(ele).find("td").eq(4).text());
                 source_exp.push($(ele).find("td").eq(6).text());
-                source_com.push($(ele).find("td").eq(8).text());
+                source_com.push($(ele).find("td").eq(12).text());
             });
             var source_amnum_clean      = window.teneReport.arrayUnique(source_amnum);
             var source_yeud_clean       = window.teneReport.arrayUnique(source_yeud);
@@ -670,11 +711,13 @@ Trace::reg_var("all-am-status",$Page->variable("all-am-status"));
                     var changed = false;
                     var newPlace = $el.find(".location-display").eq(0).data("locid"),
                         newStatus = $el.find(".status-select-rep").eq(0).val(),
-                        newStatusExp = $el.find(".amList-status-exp").eq(0).val();
+                        newStatusExp = $el.find(".amList-status-exp").eq(0).val(),
+                        newDereg    = $el.find(".dereg-select-rep").eq(0).val();
                     if (
                         parseInt(newPlace)  !==  parseInt(old.am_list_location) ||
                         parseInt(newStatus) !==  parseInt(old.am_list_status)   ||
-                        newStatusExp    !==  old.am_list_status_exp
+                        newStatusExp    !==  old.am_list_status_exp ||
+                        parseInt(newDereg) !==  parseInt(old.am_list_dereg)
                     ) {
                         $el.data("changed",true);
                         if (mark) $el.find("td.rowIndicator").addClass("changed");
@@ -683,6 +726,27 @@ Trace::reg_var("all-am-status",$Page->variable("all-am-status"));
                     }
                 });
             }
+        },
+        restore_row : function(ele) {
+            
+            //Elements:
+            var $ele = $(ele);
+            var $row = $ele.closest(".amRow");
+            var $loc = $row.find("span.location-display").eq(0);
+            var $status = $row.find("select.status-select-rep").eq(0);
+            var $statusExp = $row.find("textarea.amList-status-exp").eq(0);
+            var $dereg = $row.find("select.dereg-select-rep").eq(0);
+            
+            //var $insince = $row.find("textarea.amList-status-exp").eq(0);
+            //var $forecast = $row.find("textarea.amList-status-exp").eq(0);
+            var old = $row.data("oldrow");
+            
+            //Reset From Old:
+            $loc.text(old.loc_name);
+            $loc.data("locid",old.am_list_location);
+            $statusExp.val(old.am_list_status_exp);
+            $dereg.val(old.am_list_dereg);
+            $status.val(old.am_list_status).trigger("change");
         },
         arrayUnique : function(a) {
             return a.reduce(function(p, c) {
