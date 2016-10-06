@@ -180,6 +180,7 @@ Trace::reg_var("all-am-dereg",$Page->variable("all-am-status"));
             </table>
         </div>
     </div>
+
     <div class="clearfix"></div>
 </div>
 <!-- manage amlah location modal -->
@@ -396,9 +397,28 @@ Trace::reg_var("all-am-dereg",$Page->variable("all-am-status"));
                             allowClear: true,
                             placeholder: window.langHook("makerep_placeholder_select_prevrep")
                         }).val(null).trigger("change");
-                        
+
                         //Load new:
                         var $table = $(".new_rep_table tbody").eq(0);
+                        //dateindereg-box
+                        //dateforecast-box
+
+                        var $datein = $(
+                            "<div class='input-group date date-widget-set' id='startDate' style='direction:ltr;'>"
+                                + "<div class='input-group-addon'>"
+                                    + "<span class='glyphicon glyphicon-calendar'></span>"
+                                + "</div>"
+                                + "<input readonly type='text' class='form-control dateindereg-box' name='dateindereg' />"
+                            + "</div>"
+                        );
+                        var $forecast = $(
+                            "<div class='input-group date date-widget-set' id='startDate' style='direction:ltr;'>"
+                                + "<div class='input-group-addon'>"
+                                    + "<span class='glyphicon glyphicon-calendar'></span>"
+                                + "</div>"
+                                + "<input readonly type='text' class='form-control dateforecast-box' name='dateforecast' />"
+                            + "</div>"
+                        );
                         var $htmlRows = [];
                         for (var i=0; i < response.results.amlist.length; i++) {
                             
@@ -422,6 +442,10 @@ Trace::reg_var("all-am-dereg",$Page->variable("all-am-status"));
                             var $deregSelect = $("#tene-filter-amdereg").clone().attr("id","").removeClass("tene-filter-rows-inselect").addClass("dereg-select-rep").find("option").prop("selected",false).end();
                             $deregSelect.find("option[value=" + response.results.amlist[i].am_list_dereg + "]").attr('selected',"selected");
                             
+                            //Set datepickers:
+                            $datein.val(response.results.amlist[i].am_list_indereg_since);
+                            $forecast.val(response.results.amlist[i].am_list_forecast);
+                            
                             $htmlRows.push(
                                 $("<tr class='amRow'>"
                                 + "<td style='width:20px;' class='rowIndicator'></td>"
@@ -430,13 +454,13 @@ Trace::reg_var("all-am-dereg",$Page->variable("all-am-status"));
                                 + "<td>" + response.results.amlist[i].am_list_yeud + "</td>"
                                 + "<td><span class='location-display' data-locid='" + response.results.amlist[i].am_list_location + "'>" + response.results.amlist[i].loc_name + "</span><span class='glyphicon glyphicon-map-marker location-but-trigger noselect' aria-hidden='true'></span></td>"
                                 + "<td>" + $statusSelect[0].outerHTML + "</td>"
-                                + "<td style='line-height:1px;'><textarea class='amList-status-exp'>" + response.results.amlist[i].am_list_status_exp + "</textarea></td>"
+                                + "<td style='line-height:1px;'><textarea class='form-control amList-status-exp'>" + response.results.amlist[i].am_list_status_exp + "</textarea></td>"
                                 + "<td>" + response.results.amlist[i].am_list_status_exp_log + "</td>"
                                 + "<td></td>"
                                 + "<td>" + $deregSelect[0].outerHTML + "</td>"
-                                + "<td></td>"
-                                + "<td></td>"
-                                + "<td><textarea class='amList-status-note'>" + "</textarea></td>"
+                                + "<td>" + $datein[0].outerHTML + "</td>"
+                                + "<td>" + $forecast[0].outerHTML + "</td>"
+                                + "<td><textarea class='form-control amList-status-note'>" + "</textarea></td>"
                                 + "</tr>")
                                 .data("oldrow", response.results.amlist[i])
                                 .data("changed", false)
@@ -462,6 +486,11 @@ Trace::reg_var("all-am-dereg",$Page->variable("all-am-status"));
                         
                         //Load inputs:
                         window.teneReport.loadautocompletes();
+                        
+                        //Set datepikers:
+                        $table.find(".date-widget-set").datetimepicker({
+                            format: "YYYY-MM-DD HH:mm:ss"
+                        });
                         
                         //Fade:
                         $(".makerep_loaded_unit_title").fadeIn(function(){

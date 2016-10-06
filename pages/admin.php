@@ -12,7 +12,7 @@ Trace::add_step(__FILE__,"Loading Page: admin");
 Trace::add_step(__FILE__,"Define css libs for head section");
 $Page->include_css(array(
     GPATH_LIB_STYLE."font-awesome.min.css",
-    GPATH_LIB_STYLE."bootstrap.min.css",
+    GPATH_LIB_STYLE."bootstrap/css/bootstrap.min.css",
     GPATH_LIB_STYLE."datatables/dataTables.bootstrap.css",
     GPATH_LIB_STYLE."selectjquery/select2.css"
 ));
@@ -22,7 +22,7 @@ $Page->include_css(array(
 Trace::add_step(__FILE__,"Define js libs for head section");
 $Page->include_js(array(
     GPATH_LIB_JS."jquery-1.12.3.min.js",
-    GPATH_LIB_JS."bootstrap.min.js",
+    GPATH_LIB_STYLE."bootstrap/js/bootstrap.min.js",
     GPATH_LIB_JS."datatables/jquery.dataTables.js",
     GPATH_LIB_JS."datatables/dataTables.bootstrap.js",
     GPATH_LIB_JS."typeahead.js",
@@ -61,11 +61,36 @@ $Page->variable("load-view", (!empty($_view)
 
 
 /***************  Set additional end body JS import and Conditional JS  *******************/
-Trace::add_step(__FILE__,"Define conditional js libs for end body section");
+Trace::add_step(__FILE__,"Define js libs for end body section");
 $Page->include_js(array(
     GPATH_LIB_JS."app.js"
 ), false);
    
+
+/***************  Conditional Loading Libraries  **********************************/
+Trace::add_step(__FILE__,"Define conditional libs base on display mode");
+$cond_css = array();
+$cond_js_head = array();
+$cond_js_body = array();
+
+switch ($Page->variable("load-view")) {
+    case "dash":
+    break;
+    case "makereport":
+        $cond_css[]     = GPATH_LIB_STYLE."datepicker.min.css";
+        $cond_js_head[] = GPATH_LIB_JS."datetimepicker/moment.min.js";
+        $cond_js_head[] = GPATH_LIB_JS."datetimepicker/bootstrap-datetimepicker.min.js";
+    break; 
+    case "showreport":
+    break;           
+    case "stats":
+    break; 
+    case "inventory":
+    break; 
+}
+$Page->include_css($cond_css);
+$Page->include_js($cond_js_head);
+$Page->include_js($cond_js_body, false);
 
 
 /****************************** Set page header ***********************************/
@@ -75,11 +100,8 @@ require_once PATH_STRUCT.'head.php';
 
 
 /****************************** Page Debugger Output ***********************************/
-//Trace::reg_var("onload view", $Page->variable("load-view"));
-//Trace::reg_var("all plans", $Page->variable("all-plans"));
-//Trace::reg_var("all encodings", $Page->variable("all-encodings"));
+Trace::reg_var("onload view", $Page->variable("load-view"));
 Trace::add_step(__FILE__,"Load page HTML");
-
 
 ?>
 <?php
