@@ -413,6 +413,66 @@ h4.makerep_loaded_unit_title span {
     margin-left: 4px;
     margin-right: 4px;
     cursor:pointer;
+    color:#555555;
+}
+/*************************************************************
+ * Modal Edit Parts :
+ *************************************************************/
+.modalTeneF .modalTeneF_wrap .parts-list-for-am {
+    padding:15px;
+    height: 300px;
+}
+
+.modalTeneF .modalTeneF_wrap .parts-list-for-am > table {
+    display: flex;
+    flex-flow: column;
+    height: 100%;
+    width: 100%;
+    font-size: 11px;
+}
+.modalTeneF .modalTeneF_wrap .parts-list-for-am > table thead {
+    flex: 0 0 auto;
+    width: calc(100% - 1.5em);
+}
+.modalTeneF .modalTeneF_wrap .parts-list-for-am > table tbody {
+    /* body takes all the remaining available space */
+    flex: 1 1 auto;
+    display: block;
+    overflow-y: scroll;
+}
+.modalTeneF .modalTeneF_wrap .parts-list-for-am > table tbody tr {
+    width: 100%;
+}
+.modalTeneF .modalTeneF_wrap .parts-list-for-am > table thead,
+.modalTeneF .modalTeneF_wrap .parts-list-for-am > table tbody tr {
+    display: table;
+    table-layout: fixed;
+}
+.modalTeneF .modalTeneF_wrap .parts-list-for-am > table > tbody > tr:last-child {
+    border-bottom: 1px solid #9e9e9e;
+}
+.modalTeneF .modalTeneF_wrap .parts-list-for-am th {
+    border: 1px solid #9e9e9e;
+    padding: 5px;
+    background-color: #e6e6e6;
+    font-size: 12px;
+    text-align:center;
+    border-bottom: 0px;
+}
+.modalTeneF .modalTeneF_wrap .parts-list-for-am td {
+    border: 1px solid #9e9e9e;
+    text-align: right;
+    padding: 5px;
+    border-bottom: 0px;
+}
+.modalTeneF .modalTeneF_wrap .parts-list-for-am td.partRow_num input {
+    width:100%;
+}
+.modalTeneF .modalTeneF_wrap .parts-list-for-am td.partRow_status input {
+    width:100%;
+}
+.modalTeneF .modalTeneF_wrap .parts-list-for-am td.partRow_supplied {
+    text-align: center !important;
 }
 /*************************************************************
  * Spacers :

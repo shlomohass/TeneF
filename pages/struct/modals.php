@@ -28,7 +28,7 @@
       <div class="modal-body">
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-primary pull-left" onclick="" data-dismiss="modal">סגור</button>
+        <button type="button" class="btn btn-primary pull-left dis-but" onclick="" data-dismiss="modal">סגור</button>
       </div>
     </div>
   </div>

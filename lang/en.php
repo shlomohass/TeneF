@@ -53,6 +53,19 @@ $Lang = array(
         "page_makereport_label_civil"       => "אזרחי",
         "page_makereport_label_base"        => "בסיס",
         
+        //Edit parts Modal:
+        "page_makereport_modal_parts_header"        => "ערוך חלפים",
+        "page_makereport_modal_parts_header_add"    => "צור חלפים חדשים",
+        "page_makereport_modal_select_parts_head"   => "בחר חלפים והוסף",
+        "page_makereport_modal_update_parts_head"   => "רשימת חלפים",
+        "page_makereport_modal_but_parts_add"       => "סגור ושמור עריכת חלפים",
+        "page_makereport_modal_but_parts_close"     => "סגור ואל תשמור",
+        "page_makereport_modal_part_num_place"      => "הקלד מקט",
+        "page_makereport_modal_part_name_place"     => "הקלד שם קצר",
+        "page_makereport_modal_part_desc_place"     => "הקלד תיאור",
+        "page_makereport_modal_but_part_new"        => "צור חלף והוסף",
+        "page_makereport_modal_but_parts_select"    => "בחר חלף והוסף",
+        
     //Page Dashboard:
         "page_showreport_title"         => "הפק דוח כשירות",
         
@@ -108,11 +121,18 @@ $Lang = array(
             "makerep_warn_select_unit"              => "עליך לבחור יחידה לפני טעינתה",
             "makerep_error_load_unit"               => "אירעה שגיאה בעת טעינת יחידה",
             "makerep_error_load_loc"                => "אירעה שגיאה בטיענת רשימת מיקומים",
+            "makerep_error_load_parts"              => "אירעה שגיאה בטיענת רשימת חלפים",
             "makerep_placeholder_select_loc"        => "בחר מיקום",
+            "makerep_placeholder_select_part"       => "בחר חלף",
             "makerep_warn_setlocname"               => "אנא הזן שם מיקום",
             "makerep_warn_setlocname_exists"        => "מיקום חדש כבר מוזן במערכת בחר מהרשימה מתחת - לא ניתן להזין אותו מיקום.",
             "makerep_error_savenew_loc"             => "אירעה שגיאה בעת שמירת מיקום חדש במערכת",
             "makerep_warn_select_loc_empty"         => "עליך לבחור מיקום מהרשימה הנפתחת טרם השמירה",
+            "makerep_no_parts_witing_row"           => "לא ממתין לחלפים",
+            "makerep_warn_must_select_part"         => "עליך לבחור חלף מהרשימה על מנת להוסיף",
+            "makerep_warn_must_part_is_in"          => "החלק כבר מוזן שנה כמות במקום",
+            "makerep_set_part_num_req"              => "הקלד כמות נדרשת",
+            "makerep_set_part_status_req"           => "הקלד סטאטוס טיפול",
             
             //inventory window:
             "inven_modal_but_edit_sadac"            => 'נהל סד"כ',

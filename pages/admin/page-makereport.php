@@ -238,6 +238,76 @@ Trace::reg_var("all-am-dereg",$Page->variable("all-am-status"));
     </div>
 </div>
 
+<!-- manage amlah parts modal -->
+<div id="manage_am_parts" class='modalTeneF' data-partsrowedit="-1">
+    <div class="modalTeneF_wrap">
+        <div class='modalTeneF_head'><?php Lang::P("page_makereport_modal_parts_header"); ?><span class="highlighted_name"></span></div>
+        <div class='modalTeneF_bodyFixed'>
+            <div class="add_location_form">
+                <h4><span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+                    <?php Lang::P("page_makereport_modal_parts_header_add"); ?>
+                </h4>
+                <form id="add_parts_form"class="form-inline">
+                  <div class="form-group">
+                    <input type="text" class="form-control" name="partnum" id="partnum" placeholder="<?php Lang::P("page_makereport_modal_part_num_place"); ?>" style="width:250px;" />
+                  </div>
+                  <div class="form-group">
+                    <input type="text" class="form-control" name="partname" id="partname" placeholder="<?php Lang::P("page_makereport_modal_part_name_place"); ?>" style="width:250px;" />
+                  </div>
+                  <div class="form-group">
+                    <input type="text" class="form-control" name="partdesc" id="partdesc" placeholder="<?php Lang::P("page_makereport_modal_part_desc_place"); ?>" style="width:250px;" />
+                  </div>
+                  <button type="button" class="btn btn-primary addlocbutton" onclick="window.teneReport.setNewLocation(this)">
+                      <?php Lang::P("page_makereport_modal_but_part_new"); ?>
+                  </button>
+                </form>
+            </div>
+            <br />
+            <h4><span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span>
+                <?php Lang::P("page_makereport_modal_select_parts_head"); ?>
+            </h4>
+            <form id="select_loc_form"class="form-inline">
+                  <div class="form-group">
+                      <select class="form-control" id="partsselect" style="width:450px;"></select>
+                  </div>
+                  <button type="button" class="btn btn-primary selectlocbutton" onclick="window.teneReport.selectAddPart(this)">
+                      <?php Lang::P("page_makereport_modal_but_parts_select"); ?>
+                  </button>
+            </form>
+            <br />
+            <h4><span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span>
+                <?php Lang::P("page_makereport_modal_update_parts_head"); ?>
+            </h4>
+            <div class="parts-list-for-am">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>מסד</th>
+                            <th>תאריך הזנה</th>
+                            <th>מק"ט</th>
+                            <th>חלף</th>
+                            <th>כמות נדרשת</th>
+                            <th>סטאטוס</th>
+                            <th>התקבל</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class='modalTeneF_foot'>
+            <button type="button" class="btn btn-primary" onclick="">
+                <?php Lang::P("page_makereport_modal_but_parts_add"); ?>
+            </button>
+            <button type="button" class="btn btn-warning" onclick="window.teneReport.disPartsModal();">
+                <?php Lang::P("page_makereport_modal_but_parts_close"); ?>
+            </button>
+        </div>
+    </div>
+</div>
+
 <!-- page main logic script -->
 <script>
     
@@ -329,6 +399,9 @@ Trace::reg_var("all-am-dereg",$Page->variable("all-am-status"));
     $(document).on("click", ".location-but-trigger", function(){
         window.teneReport.loadLocationModal(this);
     });
+    $(document).on("click", ".parts-selector", function(){
+        window.teneReport.loadPartsModal(this);
+    });
     $(document).on("change", ".status-select-rep", function(){
         window.teneReport.validate_rows_for_changes(true);
     });
@@ -357,7 +430,13 @@ Trace::reg_var("all-am-dereg",$Page->variable("all-am-status"));
                  unit_id:   $('#makereport_unit_set').val()
             };
             if (data.unit_id == "" || data.unit_id == null) {
-                window.alertModal("אזהרה",window.langHook("makerep_warn_select_unit"));
+                window.alertModal(
+                    "אזהרה",
+                    window.langHook("makerep_warn_select_unit"),
+                    function() {
+                        $('#makereport_unit_set').data("select2").open();
+                    }
+                );
                 return;
             }
             $.ajax({
@@ -429,6 +508,7 @@ Trace::reg_var("all-am-dereg",$Page->variable("all-am-status"));
                             response.results.amlist[i].am_list_dereg = response.results.amlist[i].am_list_dereg === null ? -1 : response.results.amlist[i].am_list_dereg;
                             response.results.amlist[i].am_list_indereg_since = response.results.amlist[i].am_list_indereg_since === null ? "" : response.results.amlist[i].am_list_indereg_since;
                             response.results.amlist[i].am_list_forecast = response.results.amlist[i].am_list_forecast === null ? "" : response.results.amlist[i].am_list_forecast;
+                            response.results.amlist[i].am_list_parts_req = response.results.amlist[i].am_list_parts_req === null ? "[]" : response.results.amlist[i].am_list_parts_req;
                             
                             //Set status box:
                             var $statusSelect = $("#tene-filter-amstatus").clone().attr("id","").removeClass("tene-filter-rows-inselect").addClass("status-select-rep").find("option").prop("selected",false).end();
@@ -442,6 +522,17 @@ Trace::reg_var("all-am-dereg",$Page->variable("all-am-status"));
                             $datein.attr("value", response.results.amlist[i].am_list_indereg_since);
                             $forecast.attr("value", response.results.amlist[i].am_list_forecast);
                             
+                            //Create parts object:
+                            var partsList;
+                            try {
+                                partsList = JSON.parse(response.results.amlist[i].am_list_parts_req);
+                            } catch (error) {
+                                console.log("Error parsing JSON parts of:", response.results.amlist[i].am_list_number);
+                                partsList = [];
+                                
+                            }
+                            response.results.amlist[i].am_list_parts_req = JSON.stringify(partsList);
+                            
                             $htmlRows.push(
                                 $("<tr class='amRow add-master-table-style'>"
                                 + "<td style='width:20px;' class='rowIndicator'></td>"
@@ -452,12 +543,13 @@ Trace::reg_var("all-am-dereg",$Page->variable("all-am-status"));
                                 + "<td>" + $statusSelect[0].outerHTML + "</td>"
                                 + "<td style='line-height:1px;'><textarea class='form-control amList-status-exp'>" + response.results.amlist[i].am_list_status_exp + "</textarea></td>"
                                 + "<td>" + response.results.amlist[i].am_list_status_exp_log + "</td>"
-                                + "<td><span class='parts-display'>0</span><span class='glyphicon glyphicon-plus parts-selector' aria-hidden='true'></span></div></td>"
+                                + "<td><span class='parts-display'>" + partsList.length + "</span><span class='glyphicon glyphicon-th-list parts-selector' aria-hidden='true'></span></div></td>"
                                 + "<td>" + $deregSelect[0].outerHTML + "</td>"
                                 + "<td>" + $datein[0].outerHTML + "</td>"
                                 + "<td>" + $forecast[0].outerHTML + "</td>"
                                 + "</tr>")
                                 .data("oldrow", response.results.amlist[i])
+                                .data("newParts", partsList)
                                 .data("changed", false)
                             );
                         }
@@ -568,7 +660,7 @@ Trace::reg_var("all-am-dereg",$Page->variable("all-am-status"));
         loadLocationModal : function(ele) {
             
             var $ele = $(ele);
-            var $row = $ele.closest('tr');
+            var $row = $ele.closest('tr.amRow');
             var rowData = $row.data("oldrow");
             var title = " " + rowData.am_list_number + " - " + rowData.am_type_name;
             var $modal = $("#manage_am_location");
@@ -635,6 +727,36 @@ Trace::reg_var("all-am-dereg",$Page->variable("all-am-status"));
                 },
             });  
         },
+        getPartsList : function() {
+            var data = {
+                req     : "api",
+                token   : $("#pagetoken").val(),
+                type    : "listparts"
+            };
+            return $.ajax({
+                url: 'index.php',  //Server script to process data
+                type: 'POST',
+                data: data,
+                dataType: 'json',
+                beforeSend: function() {
+                },
+                success: function(response) {
+                    if (
+                        typeof response === 'object' && 
+                        typeof response.code !== 'undefined' &&
+                        response.code == "202"
+                    ) {
+
+                    } else {
+                        window.alertModal("שגיאה",window.langHook("makerep_error_load_parts"));
+                    }
+                },
+                error: function(xhr, ajaxOptions, thrownError){
+                    console.log(thrownError);
+                    window.alertModal("שגיאה",window.langHook("makerep_error_load_parts"));
+                },
+            });  
+        },
         setNewLocation : function(ele) {
             
             var $ele    = $(ele);
@@ -651,7 +773,14 @@ Trace::reg_var("all-am-dereg",$Page->variable("all-am-status"));
 
             //validate empty:
             if (name === "" || name === null) {
-                window.alertModal("אזהרה",window.langHook("makerep_warn_setlocname"));
+                window.alertModal(
+                    "אזהרה",
+                    window.langHook("makerep_warn_setlocname"),
+                    function($tar){
+                        $tar.focus();
+                    },
+                    [$modal.find("#locname").eq(0)]
+                );
                 return;
             }
             //validate exists:
@@ -666,6 +795,16 @@ Trace::reg_var("all-am-dereg",$Page->variable("all-am-status"));
             });
             if (test) {
                 window.alertModal("אזהרה",window.langHook("makerep_warn_setlocname_exists"));
+                window.alertModal(
+                    "אזהרה",
+                    window.langHook("makerep_warn_setlocname_exists"),
+                    function(ser){
+                        console.log(ser);
+                        $("#locselect").data("select2").open();
+                        $(".select2-container .select2-search__field").val(ser).trigger("keyup");
+                    },
+                    [name]
+                );
                 return;
             }
             
@@ -743,7 +882,14 @@ Trace::reg_var("all-am-dereg",$Page->variable("all-am-status"));
                     window.teneReport.disLocationModal();
                     window.teneReport.validate_rows_for_changes(true);
                 } else {
-                    window.alertModal("אזהרה",window.langHook("makerep_warn_select_loc_empty"));
+                    window.alertModal(
+                        "אזהרה",
+                        window.langHook("makerep_warn_select_loc_empty"),
+                        function($tar){
+                            $tar.data("select2").open();
+                        },
+                        [$select]
+                    );
                 }
         },
         validate_rows_for_changes : function(mark) {
@@ -809,6 +955,170 @@ Trace::reg_var("all-am-dereg",$Page->variable("all-am-status"));
                 if (p.indexOf(c) < 0) p.push(c);
                 return p;
             }, []);
+        },
+        getTodayDate: function(format,deli) {
+            var currentDate = new Date();
+            var day = currentDate.getDate();
+            var month = currentDate.getMonth() + 1;
+            var year = currentDate.getFullYear();
+            day = day<10? '0'+day:''+day;
+            month = month<10? '0'+month:''+month;
+            year = ''+year;
+            switch (format) {
+                    case "ymd":
+                        currentDate = year + deli + month + deli + day;
+                    break;
+                    case "ydm":
+                        currentDate = year + deli + day + deli + month;
+                    break;
+                    case "dmy":
+                        currentDate = day + deli + month + deli + year;
+                    break;
+                    case "dym":
+                        currentDate = day + deli + year + deli + month;
+                    break;
+                    case "mdy":
+                        currentDate = month + deli + day + deli + year;
+                    break;
+                    case "myd":
+                        currentDate = month + deli + year + deli + day;
+                    break;
+                    default:
+                        currentDate = day + deli + month + deli + year;
+            }
+            return currentDate;
+        },
+        loadPartsModal : function(ele) {
+            var $ele = $(ele);
+            var $row = $ele.closest('tr.amRow');
+            var rowData = $row.data("oldrow");
+            var rowParts = $row.data("newParts");
+            var title = " " + rowData.am_list_number + " - " + rowData.am_type_name;
+            var $modal = $("#manage_am_parts");
+            var $modalListParts = $modal.find(".parts-list-for-am tbody");
+            
+            //Set Title:
+            $modal.find('.highlighted_name').text(title);
+            
+            //Load old Parts:
+            $modalListParts.html("");
+            if (rowParts.length === 0) {
+                    $modalListParts.append(
+                        $(
+                            "<tr class='emptyPartRow'>"
+                            + "<td colspan='7' style='text-align:center;'>" + window.langHook("makerep_no_parts_witing_row") + "</td>"
+                            + "</tr>"
+                        )
+                    );
+            } else {
+                for (var i = 0; i < rowParts.length; i++) {
+                    $modalListParts.append(
+                        $(
+                            "<tr class='partRow'>"
+                            + "<td class='text-center partRow_index'>" + (i+1) + "</td>"
+                            + "<td class='text-center partRow_date'>" + "</td>"
+                            + "<td class='text-center partRow_makat'>" + "</td>"
+                            + "<td class='partRow_name'>" + "</td>"
+                            + "<td class='partRow_num'><input class='' type='text' value='" + "' /></td>"
+                            + "<td class='partRow_status'><input class='' type='text' placeholder='' value='" + "' /></td>"
+                            + "<td class='text-center partRow_supplied'><input class='' type='checkbox' " + "/></td>"
+                        + "</tr>"
+                        )
+                    );
+                }
+            }
+            
+            //Load Parts list:
+            var fire = window.teneReport.getPartsList();
+            fire.success(function(response) {
+                var partOp = [];
+                if (typeof response.results.parts === "object") {
+                    var partList = response.results.parts;
+                    for (var i = 0; i < partList.length; i++) {
+                        partOp.push({ id:partList[i].pcat_num , text:partList[i].pcat_num + " :: " + partList[i].pcat_name });
+                    }
+                }
+                
+                //Set Select 2:
+                $("#partsselect").select2({
+                    data: partOp,
+                    dir: "rtl",
+                    placeholder: window.langHook("makerep_placeholder_select_part"),
+                    allowClear: true
+                }).val(null).trigger("change");
+                
+                //Set row editing:
+                $modal.data("partsrowedit", $ele.closest("td").find("span.parts-display"));
+                
+                //Load Modal:
+                $modal.fadeIn();
+            });
+        },
+        disPartsModal : function() {
+            $("#manage_am_parts").fadeOut();
+        },
+        selectAddPart : function(ele) {
+            var $ele = $(ele);
+            var $modal = $("#manage_am_parts");
+            var $modalListParts = $modal.find(".parts-list-for-am tbody");
+            var $partRows = $modalListParts.find("tr.partRow");
+            var $emptyPartRows = $modalListParts.find("tr.emptyPartRow");
+            var $select = $modal.find("#partsselect").eq(0);
+            var selected = $select.select2('data');
+            if (selected !== null && selected.length > 0) {
+                
+                selected = selected[0];
+                
+                //validate unique:
+                var validate = true;
+                var foundAt = 0;
+                for (var i = 0; i < $partRows.length; i++) {
+                    if ($partRows.eq(i).find(".partRow_makat").eq(0).text().trim() === selected.id) {
+                        validate = false;
+                        foundAt = i + 0;
+                        break;
+                    }
+                }
+                if (!validate) {
+                    window.alertModal(
+                        "אזהרה",
+                        window.langHook("makerep_warn_must_part_is_in"),
+                        function(index) {
+                            var $to = $("#manage_am_parts .partRow").eq(index).find(".partRow_num input").eq(0);
+                            if ($to.length > 0) {
+                                $to.focus();
+                            }
+                        },
+                        [foundAt]
+                    );
+                    return;
+                }
+                
+                //Check empty row:
+                if ($emptyPartRows.length > 0) {
+                    $emptyPartRows.remove();
+                }
+                
+                //set index:
+                var index = $partRows.length + 1;
+
+                $modalListParts.append(
+                    $(
+                        "<tr class='partRow'>"
+                            + "<td class='text-center partRow_index'>" + index + "</td>"
+                            + "<td class='text-center partRow_date'>" + window.teneReport.getTodayDate("ymd","-") + "</td>"
+                            + "<td class='text-center partRow_makat'>" + selected.id + "</td>"
+                            + "<td class='partRow_name'>" + selected.text.substring(selected.text.indexOf("::") + 2).trim() + "</td>"
+                            + "<td class='partRow_num'><input class='' type='number' value='1' placeholder='" + window.langHook("makerep_set_part_num_req") + "'/></td>"
+                            + "<td class='partRow_status'><input class='' type='text' placeholder='" + window.langHook("makerep_set_part_status_req") + "' /></td>"
+                            + "<td class='text-center partRow_supplied'><input class='' type='checkbox' /></td>"
+                        + "</tr>"
+                    )
+                );
+            } else {
+                window.alertModal("אזהרה",window.langHook("makerep_warn_must_select_part"));
+            }
+            
         }
      };
 </script>

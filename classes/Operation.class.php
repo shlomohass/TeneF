@@ -20,7 +20,16 @@ class Operation {
         $results = $conn->get("location");
         return (!empty($results))?$results:array();
     }
-
+    
+    /* Get all the saved parts catalog:
+     * @param $conn -> DB connection.
+     * @return Array()
+     */
+    public function get_parts_list($conn) {
+        $results = $conn->get("amlah_parts_cat");
+        return (!empty($results))?$results:array();
+    }
+    
     /* Get A unit information provide unit ID:
      * @param $unitId -> Integer.
      * @param $conn -> DB connection.
@@ -104,7 +113,8 @@ class Operation {
              `amlah_status`.`am_status_color`, 
              `amlah_list`.`am_list_status_exp`, 
              `amlah_list`.`am_list_status_exp_log`,
-             `amlah_list`.`am_list_dereg`, 
+             `amlah_list`.`am_list_parts_req`, 
+             `amlah_list`.`am_list_dereg`,
              `repare_deg`.`deg_name`, 
              `amlah_list`.`am_list_indereg_since`, 
              `amlah_list`.`am_list_forecast`, 

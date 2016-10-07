@@ -38,6 +38,26 @@ if ( $inputs['type'] !== '' ) {
             
         break;
         
+        /**** List Locations: ****/
+        case "listparts":  
+            
+            //Logic:
+            $Op = new Operation();
+            
+            $partList = $Op->get_parts_list($Api::$conn);
+            
+            //Output:
+            if (is_array($partList)) {
+               $results = array(
+                   "parts" => $partList,
+                );
+                $success = "with-results";
+            } else {
+                $Api->error("results-false");
+            }
+            
+        break;
+            
         /**** Set new Location: ****/
         case "addlocation":
             
