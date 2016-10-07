@@ -456,7 +456,7 @@ Trace::reg_var("all-am-dereg",$Page->variable("all-am-status"));
                                 + "<td>" + $statusSelect[0].outerHTML + "</td>"
                                 + "<td style='line-height:1px;'><textarea class='form-control amList-status-exp'>" + response.results.amlist[i].am_list_status_exp + "</textarea></td>"
                                 + "<td>" + response.results.amlist[i].am_list_status_exp_log + "</td>"
-                                + "<td></td>"
+                                + "<td><span class='parts-display'>0</span><span class='glyphicon glyphicon-plus parts-selector' aria-hidden='true'></span></div></td>"
                                 + "<td>" + $deregSelect[0].outerHTML + "</td>"
                                 + "<td>" + $datein[0].outerHTML + "</td>"
                                 + "<td>" + $forecast[0].outerHTML + "</td>"
