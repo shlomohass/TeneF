@@ -84,7 +84,7 @@ Trace::reg_var("all-am-dereg",$Page->variable("all-am-status"));
             </form>
             <table class="new_rep_table">
                 <thead>
-                    <tr class="prevent-search">
+                    <tr class="prevent-search add-master-table-style">
                         <th>*</th>
                         <th>מס צ'</th>
                         <th>סוג</th>
@@ -97,11 +97,10 @@ Trace::reg_var("all-am-dereg",$Page->variable("all-am-status"));
                         <th>דרג תיקון</th>
                         <th>ברישום מתאריך</th>
                         <th>צפי תיקון</th>
-                        <th>הערה</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr class="prevent-search">
+                    <tr class="add-master-table-style prevent-search">
                         <td>
                         </td>
                         <td>
@@ -170,11 +169,6 @@ Trace::reg_var("all-am-dereg",$Page->variable("all-am-status"));
                         </td>
                         <td></td>
                         <td></td>
-                        <td>
-                            <div class="form-group">
-                                <input type="text" class="tene-filter tene-filter-rows-inarea form-control" id="tene-filter-comment" placeholder="חפש הערות" />
-                            </div>
-                        </td>
                     </tr>
                 </tbody>
             </table>
@@ -338,10 +332,10 @@ Trace::reg_var("all-am-dereg",$Page->variable("all-am-status"));
     $(document).on("change", ".status-select-rep", function(){
         window.teneReport.validate_rows_for_changes(true);
     });
-    $(document).on("change", ".amList-status-exp", function(){
+    $(document).on("change.validateRows", ".amList-status-exp", function(){
         window.teneReport.validate_rows_for_changes(true);
     });
-    $(document).on("change", ".dereg-select-rep", function(){
+    $(document).on("change.validateRows", ".dereg-select-rep", function(){
         window.teneReport.validate_rows_for_changes(true);
     });
     $(document).on("click", ".rowIndicator.changed", function(){
@@ -350,6 +344,7 @@ Trace::reg_var("all-am-dereg",$Page->variable("all-am-status"));
     
     //Report Object:
      window["teneReport"] = {
+        enableVlidateRows : false,
         loadUnit : function(t) {
             var $but = $(t);
             //unload:
@@ -373,6 +368,7 @@ Trace::reg_var("all-am-dereg",$Page->variable("all-am-status"));
                 beforeSend: function() {
                     $but.prop("disabled", true);
                     $('#makereport_unit_set').prop("disabled", true);
+                    window.teneReport.enableVlidateRows = false;
                 },
                 success: function(response) {
                     if (
@@ -401,23 +397,22 @@ Trace::reg_var("all-am-dereg",$Page->variable("all-am-status"));
 
                         //Load new:
                         var $table = $(".new_rep_table tbody").eq(0);
-                        //dateindereg-box
-                        //dateforecast-box
-
+                        
+                        //Rows and Elements
                         var $datein = $(
-                            "<div class='input-group date date-widget-set' id='startDate' style='direction:ltr;'>"
+                            "<div class='input-group date date-widget-set date-indereg' id='startDate' style='direction:ltr;'>"
                                 + "<div class='input-group-addon'>"
                                     + "<span class='glyphicon glyphicon-calendar'></span>"
                                 + "</div>"
-                                + "<input readonly type='text' class='form-control dateindereg-box' name='dateindereg' />"
+                                + "<input type='text' class='form-control dateindereg-box' name='dateindereg' />"
                             + "</div>"
                         );
                         var $forecast = $(
-                            "<div class='input-group date date-widget-set' id='startDate' style='direction:ltr;'>"
+                            "<div class='input-group date date-widget-set date-forecast' id='startDate' style='direction:ltr;'>"
                                 + "<div class='input-group-addon'>"
                                     + "<span class='glyphicon glyphicon-calendar'></span>"
                                 + "</div>"
-                                + "<input readonly type='text' class='form-control dateforecast-box' name='dateforecast' />"
+                                + "<input type='text' class='form-control dateforecast-box' name='dateforecast' />"
                             + "</div>"
                         );
                         var $htmlRows = [];
@@ -444,12 +439,11 @@ Trace::reg_var("all-am-dereg",$Page->variable("all-am-status"));
                             $deregSelect.find("option[value=" + response.results.amlist[i].am_list_dereg + "]").attr('selected',"selected");
                             
                             //Set datepickers:
-                            $datein.val(response.results.amlist[i].am_list_indereg_since);
-                            $forecast.val(response.results.amlist[i].am_list_forecast);
-                            console.log(response.results.amlist[i].am_list_indereg_since, response.results.amlist[i].am_list_forecast);
+                            $datein.attr("value", response.results.amlist[i].am_list_indereg_since);
+                            $forecast.attr("value", response.results.amlist[i].am_list_forecast);
                             
                             $htmlRows.push(
-                                $("<tr class='amRow'>"
+                                $("<tr class='amRow add-master-table-style'>"
                                 + "<td style='width:20px;' class='rowIndicator'></td>"
                                 + "<td>" + response.results.amlist[i].am_list_number + "</td>"
                                 + "<td data-search='" + response.results.amlist[i].am_type_id + "'>" + response.results.amlist[i].am_type_name + "</td>"
@@ -462,7 +456,6 @@ Trace::reg_var("all-am-dereg",$Page->variable("all-am-status"));
                                 + "<td>" + $deregSelect[0].outerHTML + "</td>"
                                 + "<td>" + $datein[0].outerHTML + "</td>"
                                 + "<td>" + $forecast[0].outerHTML + "</td>"
-                                + "<td><textarea class='form-control amList-status-note'>" + "</textarea></td>"
                                 + "</tr>")
                                 .data("oldrow", response.results.amlist[i])
                                 .data("changed", false)
@@ -473,7 +466,8 @@ Trace::reg_var("all-am-dereg",$Page->variable("all-am-status"));
                         //Append Change Status:
                         $table.find(".status-select-rep, .dereg-select-rep").each(function(inde,ele){
                             var $ele = $(ele);
-                            $ele.change(function(){
+                            $ele.on("change.setColors",function(){
+                                console.log("setColor triggered");
                                 var $e = $(this);
                                 var $td = $e.closest("td");
                                 var $opt = $e.find("option:selected");
@@ -491,13 +485,35 @@ Trace::reg_var("all-am-dereg",$Page->variable("all-am-status"));
                         
                         //Set datepikers:
                         $table.find(".date-widget-set").datetimepicker({
-                            format: "YYYY-MM-DD HH:mm:ss"
+                                format: "YYYY-MM-DD HH:mm:ss",
+                                toolbarPlacement:'bottom',
+                                showClear:true,
+                                showClose:true,
+                                showTodayButton:true
                         });
                         
+                        $table.find(".date-widget-set.date-indereg").each(function(ind, el){
+                            var $el = $(el);
+                            var value = $el.closest("tr.amRow").data("oldrow").am_list_indereg_since;
+                            $el.data("DateTimePicker").date(value);
+                        });
+                        $table.find(".date-widget-set.date-forecast").each(function(ind, el){
+                            var $el = $(el);
+                            var value = $el.closest("tr.amRow").data("oldrow").am_list_forecast;
+                            $el.data("DateTimePicker").date(value);
+                        });
+                        $table.find(".date-widget-set").on("dp.change",function(e){
+                            window.teneReport.validate_rows_for_changes(true);
+                        });
+         
                         //Fade:
                         $(".makerep_loaded_unit_title").fadeIn(function(){
                             $(".makerep_prev_report, .makerep_new_report").fadeIn();
                         });
+                        
+                        //Enable validate rows:
+                        window.teneReport.enableVlidateRows = true;
+                        window.teneReport.validate_rows_for_changes(true);
                         
                     } else {
                         console.log("fail",response);
@@ -513,44 +529,41 @@ Trace::reg_var("all-am-dereg",$Page->variable("all-am-status"));
                     window.alertModal("שגיאה",window.langHook("makerep_error_load_unit"));
                 },
             });
-            
         },
         unloadUnit : function() {
             $('#make_but_load_unit').prop("disabled", false);
             $('#makereport_unit_set').prop("disabled", false);
             $(".makerep_prev_report, .makerep_new_report, .makerep_loaded_unit_title").fadeOut(function(){
                 $(".new_rep_table tbody .amRow").remove();
+                window.teneReport.resetFilters();
             });
         },
         loadautocompletes : function() {
             var source_amnum    = [],
                 source_yeud     = [],
                 source_location = [],
-                source_exp      = [],
-                source_com      = [];
+                source_exp      = [];
             $rows = $(".new_rep_table tr").not(".prevent-search");
             $.each($rows, function(ind, ele) {
                 source_amnum.push($(ele).find("td").eq(1).text());
                 source_yeud.push($(ele).find("td").eq(3).text());
                 source_location.push($(ele).find("td").eq(4).text());
                 source_exp.push($(ele).find("td").eq(6).text());
-                source_com.push($(ele).find("td").eq(12).text());
             });
             var source_amnum_clean      = window.teneReport.arrayUnique(source_amnum);
             var source_yeud_clean       = window.teneReport.arrayUnique(source_yeud);
             var source_location_clean   = window.teneReport.arrayUnique(source_location);
             var source_exp_clean        = window.teneReport.arrayUnique(source_exp);
-            var source_com_clean        = window.teneReport.arrayUnique(source_com);
             $("#tene-filter-amnum").typeahead({ source:source_amnum_clean, fitToElement:true });
             $("#tene-filter-yeud").typeahead({ source:source_yeud_clean, fitToElement:true });
             $("#tene-filter-location").typeahead({ source:source_location_clean, fitToElement:true });
             $("#tene-filter-exp").typeahead({ source:source_exp_clean, fitToElement:true });
-            $("#tene-filter-comment").typeahead({ source:source_com_clean, fitToElement:true });
         },
         resetFilters : function($e) {
             $(".new_rep_table .tene-filter-rows-indata").not($e).val("-1");
             $(".new_rep_table .tene-filter-rows-intext").not($e).val("");
             $(".new_rep_table .tene-filter-rows-inselect").not($e).val("-1");
+            $(".new_rep_table .tene-filter-rows-inarea").not($e).val("");
         },
         loadLocationModal : function(ele) {
             
@@ -734,21 +747,27 @@ Trace::reg_var("all-am-dereg",$Page->variable("all-am-status"));
                 }
         },
         validate_rows_for_changes : function(mark) {
+            if (!window.teneReport.enableVlidateRows) return;
+            console.log("validate rows fired");
             var $set = $(".new_rep_table tr.amRow");
             if ($set.length) {
                 $set.each(function(ind, el){
                     var $el = $(el);
                     var old = $el.data("oldrow");
                     var changed = false;
-                    var newPlace = $el.find(".location-display").eq(0).data("locid"),
-                        newStatus = $el.find(".status-select-rep").eq(0).val(),
-                        newStatusExp = $el.find(".amList-status-exp").eq(0).val(),
-                        newDereg    = $el.find(".dereg-select-rep").eq(0).val();
+                    var newPlace        = $el.find(".location-display").eq(0).data("locid"),
+                        newStatus       = $el.find(".status-select-rep").eq(0).val(),
+                        newStatusExp    = $el.find(".amList-status-exp").eq(0).val(),
+                        newDereg        = $el.find(".dereg-select-rep").eq(0).val(),
+                        newDateDereg    = $el.find(".dateindereg-box").eq(0).val(),
+                        newDateForecast = $el.find(".dateforecast-box").eq(0).val();
                     if (
                         parseInt(newPlace)  !==  parseInt(old.am_list_location) ||
                         parseInt(newStatus) !==  parseInt(old.am_list_status)   ||
                         newStatusExp    !==  old.am_list_status_exp ||
-                        parseInt(newDereg) !==  parseInt(old.am_list_dereg)
+                        parseInt(newDereg) !==  parseInt(old.am_list_dereg) ||
+                        newDateDereg !== old.am_list_indereg_since ||
+                        newDateForecast !== old.am_list_forecast
                     ) {
                         $el.data("changed",true);
                         if (mark) $el.find("td.rowIndicator").addClass("changed");
@@ -759,7 +778,6 @@ Trace::reg_var("all-am-dereg",$Page->variable("all-am-status"));
             }
         },
         restore_row : function(ele) {
-            
             //Elements:
             var $ele = $(ele);
             var $row = $ele.closest(".amRow");
@@ -767,17 +785,24 @@ Trace::reg_var("all-am-dereg",$Page->variable("all-am-status"));
             var $status = $row.find("select.status-select-rep").eq(0);
             var $statusExp = $row.find("textarea.amList-status-exp").eq(0);
             var $dereg = $row.find("select.dereg-select-rep").eq(0);
-            
-            //var $insince = $row.find("textarea.amList-status-exp").eq(0);
-            //var $forecast = $row.find("textarea.amList-status-exp").eq(0);
+            var $sincein = $row.find(".date-indereg").eq(0);
+            var $forecast = $row.find(".date-forecast").eq(0);
+
             var old = $row.data("oldrow");
             
             //Reset From Old:
             $loc.text(old.loc_name);
             $loc.data("locid",old.am_list_location);
             $statusExp.val(old.am_list_status_exp);
-            $dereg.val(old.am_list_dereg).trigger("change")
-            $status.val(old.am_list_status).trigger("change");
+            $dereg.val(old.am_list_dereg).trigger("change.setColors");
+            $status.val(old.am_list_status).trigger("change.setColors");
+            $sincein.data("DateTimePicker").date(
+                old.am_list_indereg_since === "" ? null : old.am_list_indereg_since
+            );
+            $forecast.data("DateTimePicker").date(
+                old.am_list_forecast === "" ? null : old.am_list_forecast
+            );
+            window.teneReport.validate_rows_for_changes(true);
         },
         arrayUnique : function(a) {
             return a.reduce(function(p, c) {

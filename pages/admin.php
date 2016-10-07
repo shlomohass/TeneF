@@ -77,7 +77,7 @@ switch ($Page->variable("load-view")) {
     case "dash":
     break;
     case "makereport":
-        $cond_css[]     = GPATH_LIB_STYLE."datepicker.min.css";
+        $cond_css[]     = GPATH_LIB_STYLE."bootstrap-datetimepicker.min.css";
         $cond_js_head[] = GPATH_LIB_JS."datetimepicker/moment.min.js";
         $cond_js_head[] = GPATH_LIB_JS."datetimepicker/bootstrap-datetimepicker.min.js";
     break; 
