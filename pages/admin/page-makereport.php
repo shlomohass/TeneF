@@ -162,7 +162,7 @@ Trace::reg_var("all-am-dereg",$Page->variable("all-am-status"));
                                     <option value="-1">ללא</option>
                                     <?php
                                         foreach ($Page->variable("all-am-dereg") as $status) {
-                                            echo "<option value='".$status["deg_id"]."'>".$status["deg_name"]."</option>";
+                                            echo "<option value='".$status["deg_id"]."' data-setcolor='".$status["deg_color"]."'>".$status["deg_name"]."</option>";
                                         }
                                     ?>
                                 </select>
@@ -246,6 +246,7 @@ Trace::reg_var("all-am-dereg",$Page->variable("all-am-status"));
 
 <!-- page main logic script -->
 <script>
+    
     //Unit select box:
     $("#makereport_unit_set").select2({ 
         allowClear: true,
@@ -445,6 +446,7 @@ Trace::reg_var("all-am-dereg",$Page->variable("all-am-status"));
                             //Set datepickers:
                             $datein.val(response.results.amlist[i].am_list_indereg_since);
                             $forecast.val(response.results.amlist[i].am_list_forecast);
+                            console.log(response.results.amlist[i].am_list_indereg_since, response.results.amlist[i].am_list_forecast);
                             
                             $htmlRows.push(
                                 $("<tr class='amRow'>"
@@ -469,7 +471,7 @@ Trace::reg_var("all-am-dereg",$Page->variable("all-am-status"));
                         $table.append($htmlRows);
                         
                         //Append Change Status:
-                        $table.find(".status-select-rep").each(function(inde,ele){
+                        $table.find(".status-select-rep, .dereg-select-rep").each(function(inde,ele){
                             var $ele = $(ele);
                             $ele.change(function(){
                                 var $e = $(this);
@@ -774,7 +776,7 @@ Trace::reg_var("all-am-dereg",$Page->variable("all-am-status"));
             $loc.text(old.loc_name);
             $loc.data("locid",old.am_list_location);
             $statusExp.val(old.am_list_status_exp);
-            $dereg.val(old.am_list_dereg);
+            $dereg.val(old.am_list_dereg).trigger("change")
             $status.val(old.am_list_status).trigger("change");
         },
         arrayUnique : function(a) {
