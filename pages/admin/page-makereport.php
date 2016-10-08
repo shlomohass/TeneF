@@ -298,7 +298,7 @@ Trace::reg_var("all-am-dereg",$Page->variable("all-am-status"));
             </div>
         </div>
         <div class='modalTeneF_foot'>
-            <button type="button" class="btn btn-primary" onclick="">
+            <button type="button" class="btn btn-primary" onclick="window.teneReport.saveAndHookParts(this)">
                 <?php Lang::P("page_makereport_modal_but_parts_add"); ?>
             </button>
             <button type="button" class="btn btn-warning" onclick="window.teneReport.disPartsModal();">
@@ -523,15 +523,20 @@ Trace::reg_var("all-am-dereg",$Page->variable("all-am-status"));
                             $forecast.attr("value", response.results.amlist[i].am_list_forecast);
                             
                             //Create parts object:
-                            var partsList;
+                            var partsList = {
+                                arr : [],
+                                json : "[]"
+                            };
                             try {
-                                partsList = JSON.parse(response.results.amlist[i].am_list_parts_req);
+                                partsList.arr = JSON.parse(response.results.amlist[i].am_list_parts_req);
+                                partsList.json = response.results.amlist[i].am_list_parts_req;
                             } catch (error) {
                                 console.log("Error parsing JSON parts of:", response.results.amlist[i].am_list_number);
-                                partsList = [];
-                                
+                                partsList = {
+                                    arr : [],
+                                    json : "[]"
+                                };
                             }
-                            response.results.amlist[i].am_list_parts_req = JSON.stringify(partsList);
                             
                             $htmlRows.push(
                                 $("<tr class='amRow add-master-table-style'>"
@@ -543,7 +548,7 @@ Trace::reg_var("all-am-dereg",$Page->variable("all-am-status"));
                                 + "<td>" + $statusSelect[0].outerHTML + "</td>"
                                 + "<td style='line-height:1px;'><textarea class='form-control amList-status-exp'>" + response.results.amlist[i].am_list_status_exp + "</textarea></td>"
                                 + "<td>" + response.results.amlist[i].am_list_status_exp_log + "</td>"
-                                + "<td><span class='parts-display'>" + partsList.length + "</span><span class='glyphicon glyphicon-th-list parts-selector' aria-hidden='true'></span></div></td>"
+                                + "<td><span class='parts-display'>" + partsList.arr.length + "</span><span class='glyphicon glyphicon-th-list parts-selector' aria-hidden='true'></span></div></td>"
                                 + "<td>" + $deregSelect[0].outerHTML + "</td>"
                                 + "<td>" + $datein[0].outerHTML + "</td>"
                                 + "<td>" + $forecast[0].outerHTML + "</td>"
@@ -905,14 +910,16 @@ Trace::reg_var("all-am-dereg",$Page->variable("all-am-status"));
                         newStatusExp    = $el.find(".amList-status-exp").eq(0).val(),
                         newDereg        = $el.find(".dereg-select-rep").eq(0).val(),
                         newDateDereg    = $el.find(".dateindereg-box").eq(0).val(),
-                        newDateForecast = $el.find(".dateforecast-box").eq(0).val();
+                        newDateForecast = $el.find(".dateforecast-box").eq(0).val(),
+                        parts           = $el.data("newParts").json;
                     if (
                         parseInt(newPlace)  !==  parseInt(old.am_list_location) ||
                         parseInt(newStatus) !==  parseInt(old.am_list_status)   ||
                         newStatusExp    !==  old.am_list_status_exp ||
                         parseInt(newDereg) !==  parseInt(old.am_list_dereg) ||
                         newDateDereg !== old.am_list_indereg_since ||
-                        newDateForecast !== old.am_list_forecast
+                        newDateForecast !== old.am_list_forecast ||
+                        parts !== old.am_list_parts_req
                     ) {
                         $el.data("changed",true);
                         if (mark) $el.find("td.rowIndicator").addClass("changed");
@@ -923,6 +930,7 @@ Trace::reg_var("all-am-dereg",$Page->variable("all-am-status"));
             }
         },
         restore_row : function(ele) {
+            
             //Elements:
             var $ele = $(ele);
             var $row = $ele.closest(".amRow");
@@ -932,7 +940,7 @@ Trace::reg_var("all-am-dereg",$Page->variable("all-am-status"));
             var $dereg = $row.find("select.dereg-select-rep").eq(0);
             var $sincein = $row.find(".date-indereg").eq(0);
             var $forecast = $row.find(".date-forecast").eq(0);
-
+            var $partsDisplay = $row.find(".parts-display").eq(0);
             var old = $row.data("oldrow");
             
             //Reset From Old:
@@ -947,6 +955,25 @@ Trace::reg_var("all-am-dereg",$Page->variable("all-am-status"));
             $forecast.data("DateTimePicker").date(
                 old.am_list_forecast === "" ? null : old.am_list_forecast
             );
+            
+            //reset parts:
+            var partsList = {
+                arr : [],
+                json : "[]"
+            };
+            try {
+                partsList.arr = JSON.parse(old.am_list_parts_req);
+                partsList.json = old.am_list_parts_req;
+            } catch (error) {
+                partsList = {
+                    arr : [],
+                    json : "[]"
+                };
+            }
+            $row.data("newParts", partsList);
+            $partsDisplay.text(partsList.arr.length);
+            
+            //Run check again:
             window.teneReport.validate_rows_for_changes(true);
         },
         arrayUnique : function(a) {
@@ -991,7 +1018,7 @@ Trace::reg_var("all-am-dereg",$Page->variable("all-am-status"));
             var $ele = $(ele);
             var $row = $ele.closest('tr.amRow');
             var rowData = $row.data("oldrow");
-            var rowParts = $row.data("newParts");
+            var rowParts = $row.data("newParts").arr;
             var title = " " + rowData.am_list_number + " - " + rowData.am_type_name;
             var $modal = $("#manage_am_parts");
             var $modalListParts = $modal.find(".parts-list-for-am tbody");
@@ -1014,13 +1041,13 @@ Trace::reg_var("all-am-dereg",$Page->variable("all-am-status"));
                     $modalListParts.append(
                         $(
                             "<tr class='partRow'>"
-                            + "<td class='text-center partRow_index'>" + (i+1) + "</td>"
-                            + "<td class='text-center partRow_date'>" + "</td>"
-                            + "<td class='text-center partRow_makat'>" + "</td>"
-                            + "<td class='partRow_name'>" + "</td>"
-                            + "<td class='partRow_num'><input class='' type='text' value='" + "' /></td>"
-                            + "<td class='partRow_status'><input class='' type='text' placeholder='' value='" + "' /></td>"
-                            + "<td class='text-center partRow_supplied'><input class='' type='checkbox' " + "/></td>"
+                            + "<td class='text-center partRow_index'>" + rowParts[i].i + "</td>"
+                            + "<td class='text-center partRow_date'>" + rowParts[i].reqdate + "</td>"
+                            + "<td class='text-center partRow_makat'>" + rowParts[i].makat + "</td>"
+                            + "<td class='partRow_name'>" + rowParts[i].name + "</td>"
+                            + "<td class='partRow_num'><input class='' type='number' value='" + rowParts[i].num + "' placeholder='" + window.langHook("makerep_set_part_num_req") + "' /></td>"
+                            + "<td class='partRow_status'><input class='' type='text' placeholder='" + window.langHook("makerep_set_part_status_req") + "' value='" + rowParts[i].status + "' /></td>"
+                            + "<td class='text-center partRow_supplied'><input class='' type='checkbox' " + ( rowParts[i].supplied ? "checked" : "" ) + " /></td>"
                         + "</tr>"
                         )
                     );
@@ -1230,6 +1257,51 @@ Trace::reg_var("all-am-dereg",$Page->variable("all-am-status"));
                     }
                 }
             });
+        },
+        saveAndHookParts : function(ele) {
+            var $el = $(ele);
+            var $modal = $("#manage_am_parts");
+            var $modalListParts = $modal.find(".parts-list-for-am tbody");
+            var $partRows = $modalListParts.find("tr.partRow");
+            var $select = $modal.find("#partsselect").eq(0);
+            var $amRowPartsDisplay = $modal.data("partsrowedit");
+            var $amRow = $amRowPartsDisplay.closest("tr.amRow");
+            
+            //General Object of parts:
+            var partsObj = {
+                arr  : [],
+                json : ""
+            };
+            
+            //Parse Request table:
+            if ($partRows.length > 0) {
+                $partRows.each(function(ind, el) {
+                    var $el = $(el);
+                    partsObj.arr.push({
+                        i            : (ind + 1),
+                        reqdate      : $el.find(".partRow_date").eq(0).text(),
+                        makat        : $el.find(".partRow_makat").eq(0).text(),
+                        name         : $el.find(".partRow_name").eq(0).text(),
+                        num          : $el.find(".partRow_num input").eq(0).val(),
+                        status       : $el.find(".partRow_status input").eq(0).val(),
+                        supplied     : $el.find(".partRow_supplied input").eq(0).is(":checked") ? true : false
+                    });
+                });
+            }
+            
+            //Hook JSON:
+            partsObj.json = JSON.stringify(partsObj.arr);
+            
+            //Set display:
+            $amRowPartsDisplay.text(partsObj.arr.length);
+            
+            //Set row save:
+            $amRow.data("newParts",partsObj);
+            
+            window.teneReport.validate_rows_for_changes(true);
+            
+            window.teneReport.disPartsModal();
+            
         }
      };
 </script>
