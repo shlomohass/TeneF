@@ -137,7 +137,8 @@ body {
     display: inline-block;
     text-decoration: none;
 }
-.admin-top-bar > ul > li > a:hover
+.admin-top-bar > ul > li > a:hover,
+.admin-top-bar > ul > li > a:focus
 {
     background-color:#454548;
     text-decoration: none;
@@ -171,11 +172,17 @@ body {
     display: inline-block;
     width: 100%;
 }
+.admin-right-bar ul.nav-but > li > a:focus {
+    background-color: #454548;
+}
 .admin-right-bar ul.nav-but > li:hover {
     background-color: #454548;
     border-right: 4px solid #784c8a;
 }
-.admin-right-bar ul.nav-but > li.nav-active:hover {
+.admin-right-bar ul.nav-but > li.nav-active > a:focus {
+    background-color: transparent;
+}
+.admin-right-bar ul.nav-but > li.nav-active:hover { 
     background-color: transparent;
 }
 .admin-right-bar ul.nav-but > li.nav-active {
