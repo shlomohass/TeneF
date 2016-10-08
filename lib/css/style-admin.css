@@ -360,6 +360,11 @@ h4.makerep_loaded_unit_title span {
     font-size: 12px;
     font-weight: bold;
 }
+.makerep_new_report .new_rep_container .new_rep_table .dereg-select-rep:focus,
+.makerep_new_report .new_rep_container .new_rep_table .status-select-rep:focus {
+    border-bottom: 1px solid #868686;
+}
+
 .makerep_new_report .new_rep_container .new_rep_table .amList-status-note,
 .makerep_new_report .new_rep_container .new_rep_table .amList-status-exp {
     line-height: 16px;

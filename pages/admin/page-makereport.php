@@ -511,11 +511,11 @@ Trace::reg_var("all-am-dereg",$Page->variable("all-am-status"));
                             response.results.amlist[i].am_list_parts_req = response.results.amlist[i].am_list_parts_req === null ? "[]" : response.results.amlist[i].am_list_parts_req;
                             
                             //Set status box:
-                            var $statusSelect = $("#tene-filter-amstatus").clone().attr("id","").removeClass("tene-filter-rows-inselect").addClass("status-select-rep").find("option").prop("selected",false).end();
+                            var $statusSelect = $("#tene-filter-amstatus").clone().attr("id","").removeClass("tene-filter tene-filter-rows-inselect").addClass("status-select-rep").find("option").prop("selected",false).end();
                             $statusSelect.find("option[value=" + response.results.amlist[i].am_list_status + "]").attr('selected',"selected");
                             
                             // Set Dereg Box:
-                            var $deregSelect = $("#tene-filter-amdereg").clone().attr("id","").removeClass("tene-filter-rows-inselect").addClass("dereg-select-rep").find("option").prop("selected",false).end();
+                            var $deregSelect = $("#tene-filter-amdereg").clone().attr("id","").removeClass("tene-filter tene-filter-rows-inselect").addClass("dereg-select-rep").find("option").prop("selected",false).end();
                             $deregSelect.find("option[value=" + response.results.amlist[i].am_list_dereg + "]").attr('selected',"selected");
                             
                             //Set datepickers:
