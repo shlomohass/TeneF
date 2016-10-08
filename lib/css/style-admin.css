@@ -329,6 +329,11 @@ h4.makerep_loaded_unit_title span {
     font-size: 11px;
     margin-bottom: 50px;
 }
+.makerep_new_report .new_rep_container .new_rep_table .tene-reset-all-filters {
+    color:#6f6b67;
+    cursor:pointer;
+    font-size: 10px;
+}
 .makerep_new_report .new_rep_container .new_rep_table .add-master-table-style > th {
     border: 1px solid #9e9e9e;
     text-align: right;

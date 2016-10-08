@@ -102,6 +102,7 @@ Trace::reg_var("all-am-dereg",$Page->variable("all-am-status"));
                 <tbody>
                     <tr class="add-master-table-style prevent-search">
                         <td>
+                            <span class="glyphicon glyphicon-remove tene-reset-all-filters" aria-hidden="true"></span>
                         </td>
                         <td>
                             <div class="form-group" style="max-width:95px;">
@@ -394,6 +395,10 @@ Trace::reg_var("all-am-dereg",$Page->variable("all-am-status"));
             }
         }); 
     });
+    $(".tene-reset-all-filters").click(function(){
+        window.teneReport.resetFilters(this);
+        $(".new_rep_table tr.amRow").show();
+    });
     
     //Set triggers:
     $(document).on("click", ".location-but-trigger", function(){
@@ -411,7 +416,7 @@ Trace::reg_var("all-am-dereg",$Page->variable("all-am-status"));
     $(document).on("change.validateRows", ".dereg-select-rep", function(){
         window.teneReport.validate_rows_for_changes(true);
     });
-    $(document).on("click", ".rowIndicator.changed", function(){
+    $(document).on("click", ".rowIndicator.changed", function() {
         window.teneReport.restore_row(this);
     });
     
@@ -651,6 +656,18 @@ Trace::reg_var("all-am-dereg",$Page->variable("all-am-status"));
             var source_yeud_clean       = window.teneReport.arrayUnique(source_yeud);
             var source_location_clean   = window.teneReport.arrayUnique(source_location);
             var source_exp_clean        = window.teneReport.arrayUnique(source_exp);
+            if ($("#tene-filter-amnum").data("typeahead") !== null) {
+                $("#tene-filter-amnum").typeahead("destroy");
+            }
+            if ($("#tene-filter-yeud").data("typeahead") !== null) {
+                $("#tene-filter-yeud").typeahead("destroy");
+            }
+            if ($("#tene-filter-location").data("typeahead") !== null) {
+                $("#tene-filter-location").typeahead("destroy");
+            }
+            if ($("#tene-filter-exp").data("typeahead") !== null) {
+                $("#tene-filter-exp").typeahead("destroy");
+            }
             $("#tene-filter-amnum").typeahead({ source:source_amnum_clean, fitToElement:true });
             $("#tene-filter-yeud").typeahead({ source:source_yeud_clean, fitToElement:true });
             $("#tene-filter-location").typeahead({ source:source_location_clean, fitToElement:true });
