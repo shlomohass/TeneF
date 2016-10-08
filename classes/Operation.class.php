@@ -176,6 +176,25 @@ class Operation {
         return false;
     }
     
+    /* Check if a part num proposal is unique:
+     * @param $conn -> DB connection.
+     * @param $part_num -> string.
+     * @return Boolean
+     */
+    public function validate_part_unique($conn, $part_num) {
+        $test = $conn->select(
+            "amlah_parts_cat", "* ", array(
+                array(
+                    'pcat_num', '=', strtoupper(trim($part_num))
+                )
+            )
+        );
+        if (empty($test)) {
+            return true;
+        }
+        return false;
+    }
+    
     /* Save A new Location To DB:
      * @param $conn -> DB connection.
      * @param $loc_name -> string.
@@ -199,6 +218,29 @@ class Operation {
         $test = $conn->insert_safe("location", $input);
         if ($test) {
             return $conn->lastid();
+        }
+        return false;
+    }
+    /* Save A new Part To DB:
+     * @param $conn -> DB connection.
+     * @param $part_num -> string.
+     * @param $part_name -> string.
+     * @param $part_desc -> string.
+     * @param $uid -> integer.
+     * @return Boolean
+     */
+    public function add_new_part($conn, $part_num, $part_name, $part_desc = "", $uid = 'NULL') {
+        
+        $input = array(
+            "pcat_num"      => strtoupper(trim($part_num)),
+            "pcat_name"     => trim($part_name),
+            "pcat_desc"     => trim($part_desc),
+            "pcat_added_by" => $uid,
+            "pcat_added_by" => $uid,
+        );
+        $test = $conn->insert_safe("amlah_parts_cat", $input);
+        if ($test) {
+            return true;
         }
         return false;
     }

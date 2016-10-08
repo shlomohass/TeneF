@@ -58,6 +58,47 @@ if ( $inputs['type'] !== '' ) {
             
         break;
             
+        /**** Set new Part: ****/
+        case "addnewpartcat":
+            
+            //Synth needed:
+            $get = $Api->Func->synth($_REQUEST, array('partnum','partname','partdesc'),false);
+            
+            //Validation input:
+            if (
+                empty($get['partnum']) || 
+                empty($get['partname'])
+            ) {
+                $Api->error("not-legal");
+            }
+            
+            //Logic:
+            $Op = new Operation();
+            $newPart = array();
+            
+            //validate:
+            if (!$Op->validate_part_unique($Api::$conn, $get['partnum'])) {
+                $Api->error("not-uni");
+            }
+            
+            //Create:
+            $newPart = $Op->add_new_part($Api::$conn,$get['partnum'],$get['partname'],$get['partdesc'],$User->user_info);
+            
+            //Output:
+            if (!empty($newPart)) {
+               $results = array(
+                   "newPart" => array(
+                        "partnum"  => strtoupper(trim($get['partnum'])),
+                        "partname" => trim($get['partname']),
+                        "partdesc" => trim($get['partdesc'])
+                   )
+                );
+                $success = "with-results";
+            } else {
+                $Api->error("query");
+            }
+        break;
+            
         /**** Set new Location: ****/
         case "addlocation":
             

@@ -133,6 +133,9 @@ $Lang = array(
             "makerep_warn_must_part_is_in"          => "החלק כבר מוזן שנה כמות במקום",
             "makerep_set_part_num_req"              => "הקלד כמות נדרשת",
             "makerep_set_part_status_req"           => "הקלד סטאטוס טיפול",
+            "makerep_error_create_parts_server"     => "אירעה שגיאה בצד השרת אנא נסה מאוחר יותר",
+            "makerep_error_create_parts_legal"      => "יש להזין מספר קטלוגי ושם פריט על מנת ליצור חלק חדש",
+            "makerep_error_create_parts_uni"        => "הפריט שאתה מנסה ליצור כבר קיים, אנא בחר אותו מהקטלוג במקום",
             
             //inventory window:
             "inven_modal_but_edit_sadac"            => 'נהל סד"כ',

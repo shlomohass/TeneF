@@ -257,7 +257,7 @@ Trace::reg_var("all-am-dereg",$Page->variable("all-am-status"));
                   <div class="form-group">
                     <input type="text" class="form-control" name="partdesc" id="partdesc" placeholder="<?php Lang::P("page_makereport_modal_part_desc_place"); ?>" style="width:250px;" />
                   </div>
-                  <button type="button" class="btn btn-primary addlocbutton" onclick="window.teneReport.setNewLocation(this)">
+                  <button type="button" class="btn btn-primary addlocbutton" onclick="window.teneReport.createPartAndAdd(this)">
                       <?php Lang::P("page_makereport_modal_but_part_new"); ?>
                   </button>
                 </form>
@@ -270,7 +270,7 @@ Trace::reg_var("all-am-dereg",$Page->variable("all-am-status"));
                   <div class="form-group">
                       <select class="form-control" id="partsselect" style="width:450px;"></select>
                   </div>
-                  <button type="button" class="btn btn-primary selectlocbutton" onclick="window.teneReport.selectAddPart(this)">
+                  <button type="button" class="btn btn-primary selectpartbutton" onclick="window.teneReport.selectAddPart(this)">
                       <?php Lang::P("page_makereport_modal_but_parts_select"); ?>
                   </button>
             </form>
@@ -799,7 +799,6 @@ Trace::reg_var("all-am-dereg",$Page->variable("all-am-status"));
                     "אזהרה",
                     window.langHook("makerep_warn_setlocname_exists"),
                     function(ser){
-                        console.log(ser);
                         $("#locselect").data("select2").open();
                         $(".select2-container .select2-search__field").val(ser).trigger("keyup");
                     },
@@ -1115,10 +1114,122 @@ Trace::reg_var("all-am-dereg",$Page->variable("all-am-status"));
                         + "</tr>"
                     )
                 );
+                
+                //Reset select:
+                $select.val(null).trigger("change");
+                
             } else {
-                window.alertModal("אזהרה",window.langHook("makerep_warn_must_select_part"));
+                window.alertModal("אזהרה",window.langHook("makerep_warn_must_select_part"),function(){
+                    $("#partsselect").select2("open");
+                });
             }
             
+        },
+        addNewPartServer : function(values, $trigger_but) {
+            var data = {
+                req      : "api",
+                token    : $("#pagetoken").val(),
+                type     : "addnewpartcat",
+                partnum  : values.num,
+                partname : values.name,
+                partdesc : values.desc
+            };
+            return $.ajax({
+                url: 'index.php',  //Server script to process data
+                type: 'POST',
+                data: data,
+                dataType: 'json',
+                beforeSend: function() {
+                    $trigger_but.prop("disabled",true);
+                },
+                error: function(xhr, ajaxOptions, thrownError){
+                    console.log(thrownError);
+                    $trigger_but.prop("disabled",false);
+                    window.alertModal("שגיאה",window.langHook("makerep_error_create_parts_server"));
+                },
+            });  
+        },
+        createPartAndAdd :function(ele) {
+            
+            var $el = $(ele);
+            var $modal = $("#manage_am_parts");
+            var $modalListParts = $modal.find(".parts-list-for-am tbody");
+            var $partRows = $modalListParts.find("tr.partRow");
+            var $emptyPartRows = $modalListParts.find("tr.emptyPartRow");
+            var $select = $modal.find("#partsselect").eq(0);
+            
+            var $newNum = $modal.find("#partnum").eq(0);
+            var $newName = $modal.find("#partname").eq(0);
+            var $newDesc = $modal.find("#partdesc").eq(0);
+            
+            var toAdd = {
+                num : $newNum.val().trim(),
+                name : $newName.val().trim(),
+                desc : $newDesc.val().trim()
+            }
+            
+            //add to server server:
+            var fire = window.teneReport.addNewPartServer(toAdd, $el);
+            fire.success(function(response) {
+                console.log(response);
+                $el.prop("disabled",false);
+                if (
+                    typeof response === 'object' && 
+                    typeof response.code !== 'undefined' &&
+                    response.code == "202"
+                ) {
+                    
+                    //Set the new part to options catalog:
+                    $select.append(
+                        "<option value='" + response.results.newPart.partnum + "'>" + response.results.newPart.partnum + " :: " + response.results.newPart.partname + "</option>"
+                    ).val(response.results.newPart.partnum).trigger("change");
+                    
+                    //Trigger adding the part:
+                    $modal.find(".selectpartbutton").eq(0).trigger("click");
+                    $select.val(null).trigger("change");
+                    
+                    //Reset the adding form:
+                    $newNum.val("");
+                    $newName.val("");
+                    $newDesc.val("");
+                                       
+                } else {
+                    if (response.code == "108") { // not legal
+                        
+                        window.alertModal("אזהרה",window.langHook("makerep_error_create_parts_legal"),
+                            function(num, name) {
+                                if (num === "") {
+                                    $("#manage_am_parts").find("#partnum").eq(0).focus();
+                                } else {
+                                    $("#manage_am_parts").find("#partname").eq(0).focus();
+                                }
+                            },[toAdd.num, toAdd.name]
+                        );
+                        
+                    } else if (response.code == "110") { // not unique
+                        
+                        //Reset the adding form:
+                        $newNum.val("");
+                        $newName.val("");
+                        $newDesc.val("");
+                        window.alertModal("אזהרה",window.langHook("makerep_error_create_parts_uni"),
+                            function(num) {
+                                $("#partsselect").data("select2").open();
+                                $(".select2-container .select2-search__field").val(num).trigger("keyup");
+                            },[toAdd.num]
+                        );
+                        
+                    } else if (response.code == "104") { // query
+                        
+                        window.alertModal("שגיאה",window.langHook("makerep_error_create_parts_server"));
+                        
+                    } else {
+                        
+                        window.alertModal("שגיאה",window.langHook("makerep_error_create_parts_server"));
+                        
+                    }
+                }
+            });
         }
      };
 </script>
