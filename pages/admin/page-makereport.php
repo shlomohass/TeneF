@@ -78,14 +78,18 @@ Trace::reg_var("all-am-dereg",$Page->variable("all-am-status"));
         <?php Lang::P("page_makereport_newRep_title"); ?><span><?php echo date("d.m.Y"); ?></span>
         <div class="new_rep_container">
             <form id="make_rep_edit_rep"class="form-inline">
-                <button type="button" class="btn btn-primary" onclick="">
+                <button type="button" class="btn btn-primary" onclick="window.teneReport.createNewReport(this)">
                           <?php Lang::P("page_makereport_but_create_report"); ?>
+                </button>
+                <button type="button" class="btn btn-primary" onclick="">
+                          <?php Lang::P("page_makereport_but_save_report"); ?>
+                          <span> jshgjhg </span>
                 </button>
             </form>
             <table class="new_rep_table">
                 <thead>
                     <tr class="prevent-search add-master-table-style">
-                        <th>*</th>
+                        <th>#</th>
                         <th>מס צ'</th>
                         <th>סוג</th>
                         <th>שייכות / ייעוד</th>
@@ -1319,6 +1323,96 @@ Trace::reg_var("all-am-dereg",$Page->variable("all-am-status"));
             
             window.teneReport.disPartsModal();
             
+        },
+        getRowSaveSet : function($row, forSaveCreate) {
+            
+            var set = {
+                changed   : false,
+                amNum     : "",
+                parts     : "[]",
+                rowId     : 0,
+                ofUnit    : 0,
+                place     : 0,
+                status    : -1,
+                statusExp : "",
+                dereg     : -1,
+                indereg   : "",
+                forecast  : ""
+            };
+            
+            if ($row.length) {
+                var oldRow      = $row.data("oldrow");
+                set.changed     = $row.data("changed");
+                set.amNum       = parseInt(oldRow.am_list_number);
+                set.amType       = parseInt(oldRow.am_type_id);
+                set.rowId       = parseInt(oldRow.am_list_id);
+                set.ofUnit      = parseInt(oldRow.am_list_of_unit);
+                set.parts       = $row.data("newParts").json;
+                set.place       = $row.find(".location-display").eq(0).data("locid");
+                set.status      = parseInt($row.find(".status-select-rep").eq(0).val());
+                set.statusExp   = $row.find(".amList-status-exp").eq(0).val();
+                set.dereg       = parseInt($row.find(".dereg-select-rep").eq(0).val());
+                set.indereg     = $row.find("input[name='dateindereg']").eq(0).val();
+                set.forecast    = $row.find("input[name='dateforecast']").eq(0).val();
+            }
+            return set;
+        },
+        createNewReport : function(ele) {
+            
+            //Needed:
+            var $ele = $(ele);
+            var $rowSet = $(".new_rep_table tr.amRow");
+            var amRows = [];
+            
+            //Reset filters:
+            window.teneReport.resetFilters();
+            $rowSet.show();
+            
+            //Validate changes all:
+            window.teneReport.validate_rows_for_changes(true);
+            
+            //Proccess:
+            $rowSet.each(function(index, row){
+                var $row = $(row);
+                var set = window.teneReport.getRowSaveSet($row,"create");
+                amRows.push(set);
+            });
+            
+            //Save to server:
+            var data = {
+                req      : "api",
+                token    : $("#pagetoken").val(),
+                type     : "createnewreport",
+                set      : amRows
+            };
+            $.ajax({
+                url: 'index.php',  //Server script to process data
+                type: 'POST',
+                data: data,
+                // dataType: 'json',
+                beforeSend: function() {
+                    $ele.prop("disabled",true);
+                },
+                success : function(response) {
+                    console.log(response);
+                    $ele.prop("disabled",false);
+                    if (
+                        typeof response === 'object' && 
+                        typeof response.code !== 'undefined' &&
+                        response.code == "202"
+                    ) {
+
+
+                    } else {
+                        
+                    }
+                },
+                error: function(xhr, ajaxOptions, thrownError){
+                    console.log(thrownError);
+                    $ele.prop("disabled",false);
+                    window.alertModal("שגיאה",window.langHook("makerep_error_create_new_server"));
+                },
+            });  
         }
      };
 </script>

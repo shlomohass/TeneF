@@ -798,6 +798,8 @@ class DB {
         foreach( $variables as $field => $value ) {
             $fields[] = $this->filter( $field );
             $values[] = ( trim(strtoupper($value)) == 'NOW()' ||
+                          trim(strtoupper($value)) == 'CURDATE()' ||
+                          trim(strtoupper($value)) == 'CURTIME()' ||
                           trim(strtoupper($value)) == 'NULL'
                         )?trim(strtoupper($value)):"'".$this->filter( $value )."'";
         }

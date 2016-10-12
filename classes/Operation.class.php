@@ -103,6 +103,7 @@ class Operation {
              `amlah_list`.`am_list_number`, 
              `amlah_list`.`am_list_yeud`, 
              `amlah_list`.`am_list_location`, 
+             `amlah_list`.`am_list_of_unit`,
              `location`.`loc_name`, 
              `location`.`loc_is_border`, 
              `location`.`loc_is_base`, 
@@ -221,6 +222,7 @@ class Operation {
         }
         return false;
     }
+    
     /* Save A new Part To DB:
      * @param $conn -> DB connection.
      * @param $part_num -> string.
@@ -243,5 +245,80 @@ class Operation {
             return true;
         }
         return false;
+    }
+
+    public function create_report_new($conn, $unit, $by, $by_name) {
+        $test = $conn->insert_safe(
+            "amlah_reports",
+            array(
+                "report_unit"       => intval($unit),
+                "report_by"         => intval($by),
+                "report_by_name"    => trim($by_name),
+                "report_date"       => "CURDATE()",
+                "report_hour"       => "CURTIME()"
+            )
+        );
+        if ($test) {
+            $last_row = $conn->lastid();
+            return $conn->select(
+                "amlah_reports",
+                '* ',
+                array(
+                    array("report_id","=",$last_row)
+                )
+            );
+        }
+        return false;
+    }
+    
+    public function create_report_logs($conn, $rep_id, $rows) {
+        foreach ($rows as $key => $row) {
+            $test = $conn->insert_safe(
+                "amlah_rep_log",
+                array(
+                    "amrep_amlah_num"       => $row["amNum"],
+                    "amrep_amlah_type"      => $row["amType"],
+                    "amrep_amlah_status"    => $row["status"] == "-1" ? "NULL" : $row["status"],
+                    "amrep_status_exp"      => $row["statusExp"],
+                    "amrep_status_exp_log"  => "",
+                    "amrep_parts_req"       => html_entity_decode($row["parts"]),
+                    "amrep_dereg"           => $row["dereg"] == "-1" ? "NULL" : $row["dereg"],
+                    "amrep_indereg_since"   => $row["indereg"] === "" ? "NULL" : $row["indereg"],
+                    "amrep_forecast"        => $row["forecast"] === "" ? "NULL" : $row["forecast"],
+                    "amrep_location"        => $row["place"] == "0" ? "NULL" : $row["place"],
+                    "amrep_of_report"       => $rep_id,
+                    "amrep_comment"         => "NULL"
+                )
+            );
+            if (!$test) {
+                return false;
+            }
+        }
+        return true;
+    }
+    
+    public function update_amlist_withset($conn, $rep_id, $rows) {
+        foreach ($rows as $key => $row) {
+            $test = $conn->update(
+                "amlah_list",
+                array(
+                    "am_list_status"        => $row["status"] == "-1" ? "NULL" : $row["status"],
+                    "am_list_status_exp"      => $row["statusExp"],
+                    "am_list_status_exp_log"  => "",
+                    "am_list_parts_req"       => html_entity_decode($row["parts"]),
+                    "am_list_dereg"           => $row["dereg"] == "-1" ? "NULL" : $row["dereg"],
+                    "am_list_indereg_since"   => $row["indereg"] === "" ? "NULL" : $row["indereg"],
+                    "am_list_forecast"        => $row["forecast"] === "" ? "NULL" : $row["forecast"],
+                    "am_list_location"        => $row["place"] == "0" ? "NULL" : $row["place"]
+                ),
+                array(
+                    array("am_list_id","=",$row["rowId"])
+                )
+            );
+            if (!$test) {
+                return false;
+            }
+        }
+        return true;
     }
 }

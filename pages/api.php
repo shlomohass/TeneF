@@ -367,7 +367,59 @@ if ( $inputs['type'] !== '' ) {
                 $Api->error("query");
             }
         break;
-        
+            
+        /**** save bew report: ****/
+        case "createnewreport":
+            
+            //Synth needed:
+            $get = $Api->Func->synth($_REQUEST, array('set'),false);
+            
+            //Validation:
+            if (
+                !is_array($get['set'])
+            ) {
+                $Api->error("not-legal");
+            }
+            //User privs:
+            $userGod = $User->is_god();
+            $userListPriv = $User->list_privs();
+            
+            //Logic:
+            $Op = new Operation();
+            
+            //Get current user name:
+            $user = $Api::$conn->get("users",$User->user_info);
+            
+            //First create a report:
+            $rep = $Op->create_report_new($Api::$conn, $get['set'][0]['ofUnit'], $User->user_info, $user["username"]);
+            if (empty($rep)) {
+                $Api->error("query");
+            }
+            
+            //Push rep logs:
+            $logs = $Op->create_report_logs($Api::$conn,$rep[0]["report_id"],$get['set']);
+            if (!$logs) {
+                $Api->error("query");
+            }
+            
+            //Set current amList:
+            $list = $Op->update_amlist_withset($Api::$conn,$rep[0]["report_id"],$get['set']);
+            if (!$list) {
+                $Api->error("query");
+            }
+            
+            //Output:
+            if (is_array($rep)) {
+               $results = array(
+                   "repRow"     => $rep
+                );
+                $success = "with-results";
+            } else {
+                $Api->error("query");
+            }
+            
+        break;
+            
         //Unknown type - error:
         default : 
             $Api->error("bad-who");

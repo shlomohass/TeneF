@@ -37,8 +37,8 @@ $Lang = array(
         "page_makereport_but_unload_unit"   => "בטל טעינה",
         "page_makereport_loaded_unit_title" => "יחידה: ",
         "page_makereport_newRep_title"      => "הוספת דוח חדש לתאריך: ",
-        "page_makereport_but_create_report" => "הפק דוח כשירות",
-        
+        "page_makereport_but_create_report" => "הפק דוח כשירות חדש",
+        "page_makereport_but_save_report" => "עדכן דוח כשירות: ",
         //Edit location Modal:
         "page_makereport_modal_header"      => "ערוך מיקום",
         "page_makereport_modal_header_add"  => "הוסף מיקום",
@@ -136,6 +136,7 @@ $Lang = array(
             "makerep_error_create_parts_server"     => "אירעה שגיאה בצד השרת אנא נסה מאוחר יותר",
             "makerep_error_create_parts_legal"      => "יש להזין מספר קטלוגי ושם פריט על מנת ליצור חלק חדש",
             "makerep_error_create_parts_uni"        => "הפריט שאתה מנסה ליצור כבר קיים, אנא בחר אותו מהקטלוג במקום",
+            "makerep_error_create_new_server"       => "אירעה שגיאה בצד השרת בזמן יצירת הדוח",
             
             //inventory window:
             "inven_modal_but_edit_sadac"            => 'נהל סד"כ',

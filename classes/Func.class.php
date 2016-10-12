@@ -20,8 +20,12 @@ class Func {
             case 'email':
                 $input = filter_var($input, FILTER_SANITIZE_EMAIL);
             break;
-            default: 
-                $input = filter_var($input, FILTER_SANITIZE_STRING);
+            default:
+                if (is_array($input)) {
+                    $input = filter_var_array($input, FILTER_SANITIZE_STRING);
+                } else {
+                    $input = filter_var($input, FILTER_SANITIZE_STRING);
+                }
         }
         return $input;
     }
