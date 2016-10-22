@@ -85,6 +85,26 @@ class Operation {
         return (!empty($results))?$results:array();
     }
     
+    /* Get A unit prev reports list:
+     * @param $unitId -> Integer.
+     * @param $conn -> DB connection.
+     * @return Array()
+     */
+    public function get_unit_prev_reports($unitId, $conn) {
+        $results = $conn->select(
+            "amlah_reports", 
+            " * ",
+            array(array("report_unit","=",$unitId)),
+            false,
+            array(
+                "DESC",
+                array("report_date")
+            ),
+            array(30)
+        );
+        return (!empty($results))?$results:array();
+    }
+    
     /* Get A unit amlah list provide unit ID -> extended:
      * @param $unitId -> Integer.
      * @param $conn -> DB connection.

@@ -464,6 +464,8 @@ Trace::reg_var("all-am-dereg",$Page->variable("all-am-status"));
                         typeof response.code !== 'undefined' &&
                         response.code == "202"
                     ) {
+                        console.log(response.results);
+                        
                         //Set unit title:
                         $(".makerep_loaded_unit_title span").text(
                             (typeof response.results.ofunit.unit_name !== "undefined") ? response.results.ofunit.unit_name : "לא מוגדר"
@@ -474,7 +476,7 @@ Trace::reg_var("all-am-dereg",$Page->variable("all-am-status"));
                         $htmlPrev = [];
                         for (var i=0; i < response.results.repList.length; i++) {
                             $htmlPrev.push(
-                                "<option value='" + response.results.repList[i].rep_group_num + "'>" + response.results.repList[i].rep_date + "</option>"
+                                "<option value='" + response.results.repList[i].report_id + "'>" + response.results.repList[i].report_hour + " &nbsp; - &nbsp; " + response.results.repList[i].report_date + "</option>"
                             );
                         }
                         

@@ -347,19 +347,30 @@ if ( $inputs['type'] !== '' ) {
                 $Api->error("not-legal");
             }
             
-            //User privs:
-            $userGod = $User->is_god();
-            $userListPriv = $User->list_privs();
-            
-            //Logic:
             $Op = new Operation();
-            $List = $Op->get_unit_am_list_for_report($get['unit_id'], $Api::$conn);
-            $Unit = $Op->get_unit_info($get['unit_id'], $Api::$conn);
+            
+            //Test Priv on unit:
+            $userGod = $User->is_god();
+            $userPrivsOnUnit = $User->check_privs_on_unit($get['unit_id']);
+            
+            $amList = false;
+            $prevList = false;
+            
+            if ($userGod || $userPrivsOnUnit['has']) {
+                
+                $amList = $Op->get_unit_am_list_for_report($get['unit_id'], $Api::$conn);
+                $prevList = $Op->get_unit_prev_reports($get['unit_id'], $Api::$conn);
+                $Unit = $Op->get_unit_info($get['unit_id'], $Api::$conn);
+                
+            } else {
+                $Api->error("no-priv");
+            }
+            
             //Output:
-            if (is_array($List)) {
+            if (is_array($amList) && is_array($prevList)) {
                $results = array(
-                   "amlist"     => $List,
-                   "repList"    =>array(),
+                   "amlist"     => $amList,
+                   "repList"    => $prevList,
                    "ofunit"     => isset($Unit[0]) ? $Unit[0] : array()
                 );
                 $success = "with-results";
